@@ -1,0 +1,32 @@
+{
+    "context-menu": {
+        ".tree-view": [{
+            "label": "Plasma",
+            "submenu": [{
+                "label": "New Project",
+                "command": "plasma:new-project"
+            }, {
+                "label": "Edit Project",
+                "command": "plasma:edit-project"
+            }, {
+                "type": "separator"
+            }, {
+                "label": "Refresh From Server",
+                "command": "plasma:refresh-from-server"
+            }]
+        }]
+    },
+    "menu": [{
+        "label": "Plasma",
+        "submenu": [{
+            "label": "Project",
+            "submenu": [{
+                "label": "New Project",
+                "command": "plasma:new-project"
+            }, {
+                "label": "Edit Project",
+                "command": "plasma:edit-project"
+            }]
+        }]
+    }]
+}

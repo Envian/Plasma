@@ -1,0 +1,38 @@
+{
+    "name": "Plasma",
+    "main": "./lib/plasma",
+    "version": "0.1.0",
+    "description": "A standalone plugin to develop Salesforce Applications.",
+    "keywords": [
+        "salesforce",
+        "apex",
+        "force.com",
+        "salesforce.com",
+        "plasma",
+        "apex",
+        "visualforce",
+        "lightning",
+        "aura"
+    ],
+    "repository": "https://github.com/Envian/plasma",
+    "homepage": "https://github.com/Envian/plasma",
+    "bugs": {
+        "url": "https://github.com/Envian/plasma"
+    },
+    "license": "MIT",
+    "engines": {
+        "atom": ">=1.0.0 <2.0.0"
+    },
+    "dependencies": {
+        "keytar": ">=4.0.4",
+        "etch": ">=0.12.6",
+        "fs-extra": ">=4.0.2",
+        "jszip": ">=3.1.5"
+    },
+    "package-deps": {
+        "language-salesforce": ">=0.6.0"
+    },
+    "deserializers": {
+        "SettingsModel": "deserialize"
+    }
+}
