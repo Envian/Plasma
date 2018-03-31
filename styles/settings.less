@@ -1,0 +1,37 @@
+// The ui-variables file is provided by base themes provided by Atom.
+//
+// See https://github.com/atom/atom-dark-ui/blob/master/styles/ui-variables.less
+// for a full listing of what's available.
+@import "ui-variables";
+
+.plasma-settings {
+    background-color: @base-background-color;
+
+    .panel {
+        max-width: 60em;
+        width: 100%;
+        padding: 2em 4.5em;
+        background-color: inherit;
+    }
+
+    .setting-description {
+        padding-bottom: @component-padding
+    }
+
+    .input-and-button {
+        width: 100%;
+        display: flex;
+
+        & > *:first-child {
+            flex-grow: 1;
+        }
+
+        & > *:not(:first-child) {
+            margin-left: @component-padding
+        }
+    }
+
+    .full-width {
+        width: 100%
+    }
+}
