@@ -5,14 +5,11 @@
     "description": "A standalone plugin to develop Salesforce Applications.",
     "keywords": [
         "salesforce",
-        "apex",
         "force.com",
         "salesforce.com",
         "plasma",
         "apex",
-        "visualforce",
-        "lightning",
-        "aura"
+        "visualforce"
     ],
     "repository": "https://github.com/Envian/plasma",
     "homepage": "https://github.com/Envian/plasma",
@@ -26,7 +23,6 @@
     "dependencies": {
         "keytar": ">=4.0.4",
         "etch": ">=0.12.6",
-        "fs-extra": ">=4.0.2",
         "jszip": ">=3.1.5"
     },
     "package-deps": {
