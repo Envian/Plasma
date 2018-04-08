@@ -17,30 +17,29 @@ It is safe to move these projects as necessary, but sharing between different us
 ### Features
 * Secure authentication with Salesforce.
 * Refreshing From Server.
-* Saving Apex and Visualforce to the server.
+* Editing Apex classes, triggers, pages, lightning components, and static resources.
 * Overwrite conflict checking.
 * Compile error highlighting.
 
 ### Known Bugs
 * Error handling is currently very poor. If you are not seeing any notifications, check the developer tools console under
 `View > Developer > Toggle Developer Tools`.
-* Session management is not well implemented at this time.
 * Server type is not preserved.
+* Static resource's `User Server Copy` currently does not work.
 
 ### Limitations
 These are the current limitations of the alpha. Everything listed here will be implemented in the future.
 
 * `Package.xml` files must be created manually. ([Sample package.xml Manifest Files](https://developer.salesforce.com/docs/atlas.en-us.api_meta.meta/api_meta/manifest_samples.htm))
-* No support for lightning development, modifying static resources, or any metadata changes.
 * No test running framework.
 * No support for deleting or creating new files.
 * No saving multiple files at once at this time.
+* No support for making metadata changes to files.
 
 ## Roadmap
-The next set of features coming out will be updates to the various API's used, most notably the tooling API. Afterwards,
-support for saving aura bundles, creating new files, deleting existing ones, and updating metadata for these tooling objects
-will be implemented.
+Version `0.3.0` will enable support for saving new files directly from Atom, and making changes to metadata in various files.
+Version `0.4.0` will be focused on test running and debugging.
 
 ## Contributing & Requests
 If you have any requests, would like to contribute, or just want to say thanks, please reach out to [Envian](https://github.com/Envian) on
-Github. 
+Github.

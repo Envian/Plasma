@@ -1,7 +1,7 @@
 {
   "name": "Plasma",
   "main": "./lib/plasma",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A standalone plugin to develop Salesforce Applications.",
   "keywords": [
     "salesforce",
@@ -9,7 +9,9 @@
     "salesforce.com",
     "plasma",
     "apex",
-    "visualforce"
+    "visualforce",
+    "lightning",
+    "aura"
   ],
   "repository": "https://github.com/Envian/plasma",
   "homepage": "https://github.com/Envian/plasma",
