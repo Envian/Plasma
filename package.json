@@ -9,7 +9,9 @@
     "salesforce.com",
     "plasma",
     "apex",
-    "visualforce"
+    "visualforce",
+    "lightning",
+    "aura"
   ],
   "repository": "https://github.com/Envian/plasma",
   "homepage": "https://github.com/Envian/plasma",
