@@ -13,6 +13,9 @@
             }, {
                 "label": "Refresh From Server",
                 "command": "plasma:refresh-from-server"
+            }, {
+                "label": "Save to Server",
+                "command": "plasma:save-to-server"
             }]
         }]
     },
@@ -26,6 +29,14 @@
             }, {
                 "label": "Edit Project",
                 "command": "plasma:edit-project"
+            }, {
+                "type": "separator"
+            }, {
+                "label": "Refresh from Server",
+                "command": "plasma:refresh-from-server"
+            }, {
+                "label": "Open in Salesforce",
+                "command": "plasma:open-sfdc"
             }]
         }]
     }]
