@@ -34,6 +34,9 @@
             }, {
                 "label": "Refresh from Server",
                 "command": "plasma:refresh-from-server"
+            }, {
+                "label": "Open in Salesforce",
+                "command": "plasma:open-sfdc"
             }]
         }]
     }]
