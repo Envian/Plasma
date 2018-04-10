@@ -25,7 +25,8 @@
   "dependencies": {
     "keytar": ">=4.0.4",
     "etch": ">=0.12.6",
-    "jszip": ">=3.1.5"
+    "jszip": ">=3.1.5",
+    "opn": ">=0.5.2"
   },
   "package-deps": {
     "language-salesforce": ">=0.6.0"
