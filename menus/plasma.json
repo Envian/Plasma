@@ -16,6 +16,9 @@
             }, {
                 "label": "Save to Server",
                 "command": "plasma:save-to-server"
+            }, {
+                "label": "Delete File from Server",
+                "command": "plasma:delete-from-server"
             }]
         }]
     },
