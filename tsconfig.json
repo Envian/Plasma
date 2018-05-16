@@ -1,29 +1,29 @@
 {
     "compilerOptions": {
-        "target": "es6",
+        "target": "es2017",
         "module": "commonjs",
-        "allowJs": true,
+        "allowJs": false,
         "jsx": "preserve",
-        "declaration": false,
+        "declaration": true,
         "sourceMap": false,
-        "outDir": "./dist",
-        "rootDir": "./lib",
+        "outDir": "./lib",
+        "rootDir": "./src",
         "removeComments": true,
         "importHelpers": true,
         "isolatedModules": true,
-        // "strict": true,
-        // "noUnusedLocals": true,
-        // "noUnusedParameters": true,
-        // "noImplicitReturns": true,
-        // "noFallthroughCasesInSwitch": true,
-
+        "strict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
         "moduleResolution": "node",
-        "baseUrl": "./lib"
+        "baseUrl": "./src"
     },
     "include": [
-        "./lib/**/*"
+        "./src/**/*.ts"
     ],
     "exclude": [
-        "node_modules"
+        "node_modules",
+        "lib"
     ]
 }
