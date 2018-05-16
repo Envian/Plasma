@@ -1,0 +1,29 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "module": "commonjs",
+        "allowJs": true,
+        "jsx": "preserve",
+        "declaration": false,
+        "sourceMap": false,
+        "outDir": "./dist",
+        "rootDir": "./lib",
+        "removeComments": true,
+        "importHelpers": true,
+        "isolatedModules": true,
+        // "strict": true,
+        // "noUnusedLocals": true,
+        // "noUnusedParameters": true,
+        // "noImplicitReturns": true,
+        // "noFallthroughCasesInSwitch": true,
+
+        "moduleResolution": "node",
+        "baseUrl": "./lib"
+    },
+    "include": [
+        "./lib/**/*"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
+}
