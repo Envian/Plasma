@@ -1,51 +1,57 @@
-"use strict";
 "use babel";
-Object.defineProperty(exports, "__esModule", { value: true });
+
 const INVALID_SESSION = "INVALID_SESSION";
-const SOAP_NAMESPACES = {
+const SOAP_NAMESPACES: {[index:string]: string} = {
     "soapenv": "http://schemas.xmlsoap.org/soap/envelope/",
     "met": "http://soap.sforce.com/2006/04/metadata"
-};
-const NAMESPACE_RESOLVER = {
+}
+const NAMESPACE_RESOLVER: XPathNSResolver = {
     lookupNamespaceURI: prefix => SOAP_NAMESPACES[prefix] || ""
 };
-async function soapRequest(project, body) {
-    console.log(body);
+
+// TODO: Fix project typing
+export async function soapRequest(project: any, body: Element | Array<Element>): Promise<Document | null> {
+console.log(body);
     const sessionElement = xmldom("met:sessionId", await project.getToken());
-    const requestBody = xmldoc(xmldom("soapenv:Header", xmldom("met:SessionHeader", sessionElement)), xmldom("soapenv:Body", ...(body instanceof Array ? body : [body])));
+    const requestBody = xmldoc(
+        xmldom("soapenv:Header",
+            xmldom("met:SessionHeader",
+                sessionElement
+            )
+        ),
+        xmldom("soapenv:Body", ... (body instanceof Array ? body: [body]))
+    );
+
     try {
         return await soapWrapper(`${project.connection.baseurl}/services/Soap/m/${project.apiVersion}`, requestBody);
-    }
-    catch (error) {
+    } catch (error) {
         if (error === INVALID_SESSION) {
             try {
                 await project.reauthenticate();
-            }
-            catch (authError) {
+            } catch (authError) {
                 throw Error("Session Expired. Please Reauthenticate.");
             }
+
             sessionElement.textContent = await project.getToken();
             return soapRequest(`${project.connection.baseurl}/services/Soap/m/${project.apiVersion}`, body);
         }
         throw error;
     }
 }
-exports.soapRequest = soapRequest;
-function getText(dom, path) {
-    if (!dom)
-        return null;
+
+export function getText(dom: Element | Document, path: string): string | null {
+    if (!dom) return null;
     const doc = dom.ownerDocument || dom;
     return doc.evaluate(path, dom, NAMESPACE_RESOLVER, XPathResult.STRING_TYPE, null).stringValue;
 }
-exports.getText = getText;
-function getNode(dom, path) {
-    if (!dom)
-        return null;
+
+export function getNode(dom: Element | Document, path: string): Node | null {
+    if (!dom) return null;
     const doc = dom.ownerDocument || dom;
     return doc.evaluate(path, dom, NAMESPACE_RESOLVER, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
 }
-exports.getNode = getNode;
-function getNodes(dom, path) {
+
+export function getNodes(dom: Element | Document, path: string): Array<Node> | null {
     const doc = dom.ownerDocument || dom;
     const search = doc.evaluate(path, dom, NAMESPACE_RESOLVER, XPathResult.UNORDERED_NODE_ITERATOR_TYPE, null);
     const returnVal = [];
@@ -55,36 +61,40 @@ function getNodes(dom, path) {
     }
     return returnVal;
 }
-exports.getNodes = getNodes;
-function xmldoc(...children) {
+
+export function xmldoc(... children: Array<any>): Document {
     const doc = document.implementation.createDocument("http://schemas.xmlsoap.org/soap/envelope/", "soapenv:Envelope", null);
+
     for (const [namespace, url] of Object.entries(SOAP_NAMESPACES)) {
         const attribute = doc.createAttribute("xmlns:" + namespace);
         attribute.value = url;
-        doc.firstChild.setAttributeNode(attribute);
+        (doc.firstChild as Element).setAttributeNode(attribute);
     }
+
     for (let child of children) {
-        if (!(child instanceof Element))
-            child = doc.createTextNode(child.toString());
-        doc.firstChild.appendChild(child);
+        if (!(child instanceof Element)) child = doc.createTextNode(child.toString());
+        (doc.firstChild as Element).appendChild(child);
     }
+
     return doc;
 }
-exports.xmldoc = xmldoc;
-function xmldom(name, ...children) {
+
+export function xmldom(name: string, ... children: Array<any>): Element {
     const parts = name.split(":");
     const elem = parts.length == 1 ?
         document.createElementNS(null, name) :
         document.createElementNS(SOAP_NAMESPACES[parts[0]] || null, name);
-    for (let child of children) {
-        if (!(child instanceof Element))
-            child = document.createTextNode(child.toString());
-        elem.appendChild(child);
-    }
+
+        for (let child of children) {
+            if (!(child instanceof Element)) child = document.createTextNode(child.toString());
+            elem.appendChild(child);
+        }
+
+
     return elem;
 }
-exports.xmldom = xmldom;
-function soapWrapper(fullUrl, body) {
+
+function soapWrapper(fullUrl: string, body: Document): Promise<Document | null> {
     return new Promise((resolve, reject) => {
         const request = new XMLHttpRequest();
         request.onreadystatechange = () => {
@@ -95,11 +105,10 @@ function soapWrapper(fullUrl, body) {
                     case 204:
                         return resolve(request.responseXML);
                     default:
-                        if (getText(request.responseXML, "//faultcode/text()") === "sf:INVALID_SESSION_ID") {
+                        if (getText(request.responseXML as Document, "//faultcode/text()") === "sf:INVALID_SESSION_ID") {
                             return reject(INVALID_SESSION);
-                        }
-                        else {
-                            return reject(Error(getText(request.responseXML, "//faultstring/text()") || undefined));
+                        } else {
+                            return reject(Error(getText(request.responseXML as Document, "//faultstring/text()") || undefined));
                         }
                 }
             }
@@ -107,6 +116,7 @@ function soapWrapper(fullUrl, body) {
         request.open("POST", fullUrl, true);
         request.setRequestHeader("content-type", "text/xml");
         request.setRequestHeader("SOAPAction", "\"\"");
+
         request.send(body);
     });
 }
