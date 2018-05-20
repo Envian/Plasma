@@ -10,7 +10,7 @@ const NAMESPACE_RESOLVER: XPathNSResolver = {
 };
 
 // TODO: Fix project typing
-export async function soapRequest(project: any, body: Element | Array<Element>): Promise<Document | null> {
+export async function soapRequest(project: any, body: Element | Array<Element>): Promise<Document> {
 console.log(body);
     const sessionElement = xmldom("met:sessionId", await project.getToken());
     const requestBody = xmldoc(
@@ -33,25 +33,23 @@ console.log(body);
             }
 
             sessionElement.textContent = await project.getToken();
-            return soapRequest(`${project.connection.baseurl}/services/Soap/m/${project.apiVersion}`, body);
+            return soapWrapper(`${project.connection.baseurl}/services/Soap/m/${project.apiVersion}`, requestBody);
         }
         throw error;
     }
 }
 
-export function getText(dom: Element | Document, path: string): string | null {
-    if (!dom) return null;
+export function getText(dom: Node, path: string): string {
     const doc = dom.ownerDocument || dom;
     return doc.evaluate(path, dom, NAMESPACE_RESOLVER, XPathResult.STRING_TYPE, null).stringValue;
 }
 
-export function getNode(dom: Element | Document, path: string): Node | null {
-    if (!dom) return null;
+export function getNode(dom: Node, path: string): Node {
     const doc = dom.ownerDocument || dom;
     return doc.evaluate(path, dom, NAMESPACE_RESOLVER, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
 }
 
-export function getNodes(dom: Element | Document, path: string): Array<Node> | null {
+export function getNodes(dom: Node, path: string): Array<Node> {
     const doc = dom.ownerDocument || dom;
     const search = doc.evaluate(path, dom, NAMESPACE_RESOLVER, XPathResult.UNORDERED_NODE_ITERATOR_TYPE, null);
     const returnVal = [];
@@ -94,7 +92,7 @@ export function xmldom(name: string, ... children: Array<any>): Element {
     return elem;
 }
 
-function soapWrapper(fullUrl: string, body: Document): Promise<Document | null> {
+function soapWrapper(fullUrl: string, body: Document): Promise<Document> {
     return new Promise((resolve, reject) => {
         const request = new XMLHttpRequest();
         request.onreadystatechange = () => {
@@ -102,8 +100,9 @@ function soapWrapper(fullUrl: string, body: Document): Promise<Document | null> 
                 switch (request.status) {
                     case 200:
                     case 201:
+                        return resolve(request.responseXML as Document);
                     case 204:
-                        return resolve(request.responseXML);
+                        return resolve(document.implementation.createDocument(null, null, null));
                     default:
                         if (getText(request.responseXML as Document, "//faultcode/text()") === "sf:INVALID_SESSION_ID") {
                             return reject(INVALID_SESSION);
