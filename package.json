@@ -23,19 +23,28 @@
     "atom": ">=1.0.0 <2.0.0"
   },
   "dependencies": {
-    "typescript": ">=2.8.3",
-    "tslib": ">=1.9.1",
     "keytar": ">=4.0.4",
     "etch": ">=0.12.6",
     "jszip": ">=3.1.5",
-    "opn": ">=0.5.2",
+    "opn": ">=0.5.2"
+  },
+  "devDependencies": {
+    "typescript": ">=2.8.3",
+    "tslib": ">=1.9.1",
     "@types/node": ">=10.1.0",
-    "@types/atom": ">=1.26.0"
+    "@types/atom": ">=1.26.0",
+    "@types/jszip": ">=3.1.3"
   },
   "package-deps": {
     "language-salesforce": ">=0.6.0"
   },
   "deserializers": {
     "SettingsModel": "deserialize"
-  }
+  },
+  "files": [
+    "keymaps/**/*",
+    "lib/**/*",
+    "menus/**/*",
+    "styles/**/*"
+  ]
 }
