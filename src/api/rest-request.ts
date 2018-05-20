@@ -1,27 +1,29 @@
-"use strict";
 "use babel";
-Object.defineProperty(exports, "__esModule", { value: true });
-const https_1 = require("https");
-const helpers_js_1 = require("../helpers.js");
+import { request } from "https";
+import { RequestOptions } from "http";
+import { getError } from "../helpers.js";
+
 const INVALID_SESSION = "INVALID_SESSION";
-async function sendAuth(project, options, body) {
+
+// TODO: fix project typing.
+export async function sendAuth<T>(project: any, options: RequestOptions, body?: any): Promise<T> {
     options.headers = options.headers || {};
     options.host = project.connection.host;
     options.headers["Content-Type"] = options.headers["Content-Type"] || "application/json";
     options.headers.Authorization = await project.getOauth();
-    body = (!body || typeof (body) === "string") ? body : JSON.stringify(body);
+    body = (!body || typeof(body) === "string") ? body: JSON.stringify(body);
+
     if (body) {
         options.headers["Content-Length"] = body.length;
     }
+
     try {
         return JSON.parse(await restWrapper(options, body));
-    }
-    catch (error) {
+    } catch (error) {
         if (error === INVALID_SESSION) {
             try {
                 await project.reauthenticate();
-            }
-            catch (authError) {
+            } catch (authError) {
                 throw Error("Session Expired. Please Reauthenticate.");
             }
             options.host = project.connection.host;
@@ -31,24 +33,26 @@ async function sendAuth(project, options, body) {
         throw error;
     }
 }
-exports.sendAuth = sendAuth;
-async function send(options, body) {
+
+export async function send<T>(options: RequestOptions, body?: any): Promise<T> {
     options.headers = options.headers || {};
     options.headers["Content-Type"] = options.headers["Content-Type"] || "application/json";
-    body = (!body || typeof (body) === "string") ? body : JSON.stringify(body);
+    body = (!body || typeof(body) === "string") ? body: JSON.stringify(body);
+
     if (body) {
         options.headers["Content-Length"] = body.length;
     }
     return JSON.parse(await restWrapper(options, body));
 }
-exports.send = send;
-function restWrapper(options, body) {
+
+function restWrapper(options: RequestOptions, body?: string): Promise<string> {
     return new Promise((resolve, reject) => {
-        const restRequest = https_1.request(options);
+        const restRequest = request(options);
         restRequest.on("response", conn => {
             let data = "";
             conn.setEncoding("utf8");
-            conn.on("data", (chunk) => data += chunk);
+
+            conn.on("data", (chunk: string) => data += chunk);
             conn.on("end", () => {
                 switch (conn.statusCode) {
                     case 200:
@@ -58,12 +62,11 @@ function restWrapper(options, body) {
                         return resolve("");
                     case 401:
                     case 403:
-                        return reject(INVALID_SESSION);
+                        return reject(INVALID_SESSION)
                     default:
                         try {
-                            data = helpers_js_1.getError(JSON.parse(data));
-                        }
-                        catch (ex) { }
+                            data = getError(JSON.parse(data));
+                        } catch (ex) {}
                         return reject(Error(data));
                 }
             });

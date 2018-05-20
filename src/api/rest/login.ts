@@ -1,12 +1,14 @@
-"use strict";
 "use babel";
-Object.defineProperty(exports, "__esModule", { value: true });
-const rest_request_js_1 = require("../rest-request.js");
+
+import { send } from "../rest-request.js";
+
 const CLIENT_ID = "3MVG9g9rbsTkKnAUsShwsp_kK_RHkTCRVKUcbvJuLIwkDpeCSMGmIupQQgcpSo26L_qyQt4HsDXeuvowD5OVs";
-function toUrlString(params) {
+
+function toUrlString(params: { [key: string]: string }): string {
     return Object.entries(params).map(pair => pair.map(encodeURIComponent).join("=")).join("&");
 }
-function getLoginPath(username) {
+
+export function getLoginPath(username?: string): string {
     const params = {
         response_type: "token",
         client_id: CLIENT_ID,
@@ -17,8 +19,8 @@ function getLoginPath(username) {
     };
     return "/services/oauth2/authorize?" + toUrlString(params);
 }
-exports.getLoginPath = getLoginPath;
-async function refreshToken(host, token) {
+
+export async function refreshToken(host: string, token: string): Promise<RefreshResult> {
     const body = toUrlString({
         grant_type: "refresh_token",
         refresh_token: token,
@@ -34,6 +36,12 @@ async function refreshToken(host, token) {
         method: "POST",
         path: "/services/oauth2/token"
     };
-    return rest_request_js_1.send(options, body);
+    return send<RefreshResult>(options, body);
 }
-exports.refreshToken = refreshToken;
+
+export interface RefreshResult {
+    instance_url: string,
+    token_type: string,
+    id: string,
+    access_token: string
+}
