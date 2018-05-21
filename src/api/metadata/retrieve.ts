@@ -1,8 +1,10 @@
 "use babel";
 
 import { loadAsync } from "jszip";
+
 import { sleep } from "../../helpers.js";
 import { soapRequest, getText, getNode, getNodes, xmldom } from "../soap-helpers.js";
+import { FileStatus } from "../../project.js";
 
 // TODO: Fix project typing
 export default async function retrieve(project : any) : Promise<RetreiveResult> {
@@ -59,5 +61,5 @@ export default async function retrieve(project : any) : Promise<RetreiveResult> 
 
 export interface RetreiveResult {
     zip: any, // TODO: Fix JSZip Typing
-    files: { [key: string]: any } // TODO: Use file status interface
+    files: FileStatus
 }
