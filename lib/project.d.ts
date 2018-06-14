@@ -1,6 +1,8 @@
 /// <reference types="node" />
 import { EventEmitter } from "events";
 import { File, Directory } from "atom";
+import { findProjectForFile, findProjectForDirectory, getProjectForFilesAndDirs } from "./project-manager.js";
+import { AuthorizationResult, ServerType } from "./components/auth-view.js";
 export default class Project extends EventEmitter {
     connection: ConnectionInfo;
     readonly root: Directory;
@@ -20,17 +22,15 @@ export default class Project extends EventEmitter {
     refreshAPIVersions(): Promise<void>;
     refreshFromServer(): Promise<void>;
     authenticate(type: ServerType): Promise<void>;
+    handleAuthResult(result: AuthorizationResult, type: ServerType): Promise<void>;
     reauthenticate(): Promise<String>;
     getToken(): Promise<string | null>;
     getOauth(): Promise<string>;
+    findProjectForFile: typeof findProjectForFile;
+    findProjectForDirectory: typeof findProjectForDirectory;
+    getProjectForFilesAndDirs: typeof getProjectForFilesAndDirs;
 }
-export declare enum ServerType {
-    Sandbox = "Sandbox",
-    Production = "Production",
-    Developer = "Developer",
-    Preview = "Preview",
-}
-export interface ConnectionInfo {
+export declare class ConnectionInfo {
     authenticated: boolean;
     type: ServerType;
     api: string;

@@ -2,9 +2,11 @@
 
 import { setPassword, getPassword } from "keytar";
 import { EventEmitter } from "events";
-import { File, Directory, WorkspaceOpenOptions } from "atom";
+import { File, Directory } from "atom";
 
-import { register } from "./project-manager.js";
+import { register, findProjectForFile, findProjectForDirectory, getProjectForFilesAndDirs } from "./project-manager.js";
+
+import { AuthorizationResult, ServerType, authorize } from "./components/auth-view.js";
 
 import { refreshToken } from "./api/rest/login.js";
 import getApiVersions from "./api/rest/api-versions.js";
@@ -48,18 +50,7 @@ export default class Project extends EventEmitter {
         this._isNew = true;
 
         this._files = {};
-        this.connection = {
-            authenticated: false,
-            type: ServerType.Sandbox,
-            api: "",
-            versions: [],
-            username: "",
-            userid: "",
-            baseurl: "",
-            host: "",
-            token_type: "",
-            id: ""
-        };
+        this.connection = new ConnectionInfo();
 console.log(this);
     }
 
@@ -78,7 +69,7 @@ console.log(this);
                 this._loaded = true;
             }
 
-            this.emit("save");
+            this.emit("save", this);
         } catch (ex) {
             atom.notifications.addError(`Failed to save project.\nDirectory: ${this.root.getPath()}\nError: ${ex.message}`, {
                 dismissable: true
@@ -106,7 +97,7 @@ console.log(this);
             this._isNew = false;
             this._loaded = true;
             this.loading = false;
-            this.emit("load");
+            this.emit("load", this);
         } catch (ex) {
             this.loading = false;
             atom.notifications.addError(`Failed to load project.\nDirectory: ${this.root.getPath()}\nError: ${ex.message}`, {
@@ -144,15 +135,11 @@ console.log(this);
 
     // Prompts the user to authenticate. Simply never returns if the user opts not to authenticate.
     async authenticate(type: ServerType): Promise<void> {
-        // TODO: Fix authorization callback
-        const result = await new Promise<any>(accept => {
-            atom.workspace.open("plasma://authenticate", {
-                type: type,
-                username: this.connection.username,
-                callback: accept
-            } as WorkspaceOpenOptions);
-        });
+        const result = await authorize(type, this.connection.username);
+        return this.handleAuthResult(result, type);
+    }
 
+    async handleAuthResult(result: AuthorizationResult, type: ServerType): Promise<void> {
         if (result.error === "access_denied") {
             atom.notifications.addWarning("Credentials not updated.");
             return;
@@ -181,7 +168,7 @@ console.log(this);
         setPassword("plasma-salesforce", result.id, result.access_token);
         setPassword("plasma-salesforce-refresh", result.id, result.refresh_token);
         atom.notifications.addSuccess(`Credentials for ${this.connection.username} successfully updated.`);
-        this.emit("authenticate");
+        this.emit("authenticate", this);
     }
 
     async reauthenticate(): Promise<String> {
@@ -206,26 +193,24 @@ console.log(this);
     async getOauth() {
         return this.connection.token_type + " " + await this.getToken();
     }
+
+    // Pull in helpers from project manager.
+    public findProjectForFile = findProjectForFile;
+    public findProjectForDirectory = findProjectForDirectory;
+    public getProjectForFilesAndDirs = getProjectForFilesAndDirs;
 }
 
-export enum ServerType {
-    Sandbox = "Sandbox",
-    Production = "Production",
-    Developer = "Developer",
-    Preview = "Preview"
-}
-
-export interface ConnectionInfo {
-    authenticated: boolean,
-    type: ServerType,
-    api: string,
-    versions: Array<string>,
-    username: string,
-    userid: string,
-    baseurl: string,
-    host: string,
-    token_type: string,
-    id: string
+export class ConnectionInfo {
+    public authenticated: boolean = false;
+    public type: ServerType = ServerType.Sandbox;
+    public api: string = "";
+    public versions: Array<string> = [];
+    public username: string = "";
+    public userid: string = "";
+    public baseurl: string = "";
+    public host: string = "";
+    public token_type: string = "";
+    public id: string = "";
 }
 
 export interface FileStatus {

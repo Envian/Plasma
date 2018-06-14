@@ -3,7 +3,8 @@
         "target": "es2017",
         "module": "commonjs",
         "allowJs": false,
-        "jsx": "preserve",
+        "jsx": "react",
+        "jsxFactory": "etch.dom",
         "declaration": true,
         "sourceMap": false,
         "outDir": "./lib",
@@ -17,10 +18,11 @@
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true,
         "moduleResolution": "node",
-        "baseUrl": "./src"
+        "baseUrl": "./src",
     },
     "include": [
-        "./src/**/*.ts"
+        "./src/**/*.ts",
+        "./src/**/*.tsx"
     ],
     "exclude": [
         "node_modules",
