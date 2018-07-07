@@ -2,7 +2,8 @@
 
 import ToolingRequest from "./tooling-request.js";
 
-export default class CRUDRequest extends ToolingRequest<any> {
+// TODO: add crud response type.
+export default class CRUDRequest<T> extends ToolingRequest<T> {
     constructor(options: CRUDOptions) {
         super({
             path: `/sobjects/${options.sobject}/` + (options.id ? (options.id + "/" ) : ""),
@@ -15,6 +16,6 @@ export interface CRUDOptions {
     sobject: string,
     method: string,
     id?: string,
-    body: any,
+    body?: any,
     referenceId?: string
 }

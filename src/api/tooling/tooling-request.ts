@@ -7,10 +7,10 @@ let counter = 0;
 function UNIQUE_REFERENCE() { return "Unused_Reference_" + counter++; }
 
 export default class ToolingRequest<T>{
-    public result?: T;
     public error?: Error;
 
     protected readonly body: any;
+    protected result?: T;
     private readonly options: RequestOptions;
     private readonly referenceId: string;
 
@@ -21,7 +21,7 @@ export default class ToolingRequest<T>{
     }
 
     // When overloaded, translates the raw response from the server into a more useful response.
-    getResult(rawResponse: any): T {
+    translateResponse(rawResponse: any): T {
         return rawResponse as T;
     }
 
@@ -40,11 +40,16 @@ export default class ToolingRequest<T>{
     async send(project: any): Promise<T> {
         this.options.path = `/services/data/v${project.apiVersion}/tooling` + this.options.path;
         try {
-            this.result = this.getResult(await sendAuth(this.options, this.body, project));
+            this.result = this.translateResponse(await sendAuth(this.options, this.body, project));
             return this.result;
         } catch (error) {
             throw error;
         }
+    }
+
+    getResult(): T {
+        if (this.result) return this.result;
+        else throw Error("Request has not been sent.")
     }
 }
 

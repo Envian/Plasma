@@ -25,14 +25,14 @@ export default class CompositeRequest extends ToolingRequest<Array<CompositeRequ
         this.requests.push(request);
     }
 
-    getResult(rawResponse: CompositeRequestResult): Array<CompositeRequestResultItem> {
+    translateResponse(rawResponse: CompositeRequestResult): Array<CompositeRequestResultItem> {
         rawResponse.compositeResponse.forEach((response, index) => {
             const request = this.requests[index];
             switch (response.httpStatusCode) {
                 case 200:
                 case 201:
                 case 204:
-                    request.result = request.getResult(response.body);
+                    request.result = request.translateResponse(response.body);
                     break;
                 default:
                     request.error = Error(getError(response.body));

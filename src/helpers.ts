@@ -32,6 +32,10 @@ export function confirm(options: ConfirmationOptions): Promise<number> {
     });
 }
 
+export function flatten<T>(items: Array<Array<T>>): Array<T> {
+    return items.reduce((flat, item) => flat.concat(item), []);
+}
+
 // TODO: Deprecate this.
 export function getError(error: any) {
     if (typeof(error) === "string") return error;

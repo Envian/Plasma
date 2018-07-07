@@ -4,7 +4,7 @@ export default class CompositeRequest extends ToolingRequest<Array<CompositeRequ
     constructor(allOrNothing: boolean, requests?: Array<ToolingRequest<any>>);
     addAll(requests: Array<ToolingRequest<any>>): void;
     add(request: ToolingRequest<any>): void;
-    getResult(rawResponse: CompositeRequestResult): Array<CompositeRequestResultItem>;
+    translateResponse(rawResponse: CompositeRequestResult): Array<CompositeRequestResultItem>;
     send(project: any): Promise<Array<CompositeRequestResultItem>>;
 }
 export interface CompositeRequestResult {
