@@ -12,8 +12,8 @@ import CRUDRequest from "../api/tooling/crud-sobject.js";
 
 import ToolingSave from "./tooling-save.js";
 import ApexSave from "./apex.js";
-// import AuraSave from "./aura.js";
-// import StaticResourceSave from "./staticresource.js";
+import AuraSave from "./aura.js";
+import StaticResourceSave from "./staticresource.js";
 import VisualforceSave from "./visualforce.js";
 
 export default async function(project: Project, files: Array<FileInfo>): Promise<void> {
@@ -92,11 +92,11 @@ function getContainerSaves(project: Project, filesByFolder: Map<string, Array<Fi
 }
 
 function getStandaloneSaves(project: Project, filesByFolder: Map<string, Array<FileInfo>>): Array<ToolingSave> {
-    // const aura = groupby(filesByFolder.get("aura") || [], file => file.entity);
-    // const staticresource = groupby(filesByFolder.get("staticresources") || [], file => file.entity);
-    //
-    // return Object.entries(aura).map(([entity, files]) => new AuraSave(project, entity, files))
-    //     .concat(Object.entries(staticresource).map(([entity, files]) => new StaticResourceSave(project, entity, files)));
+    const aura = groupby(filesByFolder.get("aura") || [], file => file.entity);
+    const staticresource = groupby(filesByFolder.get("staticresources") || [], file => file.entity);
+
+    return Object.entries(aura).map(([entity, files]) => new AuraSave(project, entity, files) as ToolingSave)
+        .concat(Object.entries(staticresource).map(([entity, files]) => new StaticResourceSave(project, entity, files)));
     return [];
 }
 

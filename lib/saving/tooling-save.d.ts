@@ -4,15 +4,13 @@ import Query from "../api/tooling/query.js";
 import FileInfo from './file-info.js';
 export default abstract class ToolingSave {
     protected readonly project: Project;
-    protected readonly path: string;
     protected readonly entity: string;
     protected readonly name: string;
     protected readonly folder: string;
-    protected readonly state?: FileStatusItem;
     protected readonly files: Array<FileInfo>;
     skip: boolean;
     success: boolean;
-    constructor(project: Project, entity: string, path: string, savedFiles: Array<FileInfo>);
+    constructor(project: Project, entity: string, savedFiles: Array<FileInfo>);
     abstract getConflictQuery(): Query;
     abstract handleConflicts(): Promise<void>;
     abstract getSaveRequest(containerId: string): Promise<Array<ToolingRequest<any>>>;

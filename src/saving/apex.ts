@@ -9,16 +9,19 @@ import { getText } from "../api/soap-helpers.js";
 import FileInfo from './file-info.js';
 
 export default class ApexSave extends ToolingSave {
-    private type: string;
+    private readonly type: string;
+    private readonly path: string;
     private readonly source: FileInfo;
     private readonly metadata?: FileInfo;
     private readonly query: Query;
-    private attributes?: { apiVersion: string, status: string };
+    private readonly state?: FileStatusItem;
 
     constructor(project: Project, entity: string, savedFiles: Array<any>) {
-        super(project, entity, entity + ".cls", savedFiles);
+        super(project, entity, savedFiles);
         this.type = this.folder === "classes" ? "ApexClass" : "ApexTrigger";
+        this.path = entity + ".cls";
 
+        this.state = project.files[this.path];
         this.source = savedFiles.find(file => !file.path.endsWith("-meta.xml"));
         this.metadata = savedFiles.find(file => file.path.endsWith("-meta.xml"));
 
@@ -64,17 +67,19 @@ export default class ApexSave extends ToolingSave {
     }
 
     async getSaveRequest(containerId: string): Promise<Array<ToolingRequest<any>>> {
+        let attributes;
+
         // If we're uploading metadata with this file, populate the attribtues attribute.
         if (this.metadata) {
             if (this.metadata.body) {
                 const metadataFile = new DOMParser().parseFromString(this.metadata.body, "text/xml");
-                this.attributes = {
+                attributes = {
                     apiVersion: getText(metadataFile, "//met:apiVersion/text()"),
                     status: getText(metadataFile, "//met:status/text()")
                 };
             } else {
                 // If the metadata file does not exist, create it with a default meta.xml
-                this.attributes = {
+                attributes = {
                     apiVersion: this.project.apiVersion,
                     status: "Active"
                 };
@@ -90,7 +95,7 @@ export default class ApexSave extends ToolingSave {
                 ContentEntityId: this.state && this.state.id,
                 FullName: (this.state && this.state.id) ? undefined : this.name,
                 MetadataContainerId: `@{${containerId}.id}`,
-                Metadata: this.attributes && this.attributes
+                Metadata: attributes
             }
         })];
     }
