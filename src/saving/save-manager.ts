@@ -97,7 +97,6 @@ function getStandaloneSaves(project: Project, filesByFolder: Map<string, Array<F
 
     return Object.entries(aura).map(([entity, files]) => new AuraSave(project, entity, files) as ToolingSave)
         .concat(Object.entries(staticresource).map(([entity, files]) => new StaticResourceSave(project, entity, files)));
-    return [];
 }
 
 function buildContainerRequests(saves: Array<ToolingRequest<any>>): [Array<CRUDRequest<any>>, CRUDRequest<any>] {
