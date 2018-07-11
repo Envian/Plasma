@@ -21,7 +21,7 @@ export default class SettingsView {
 
     // Etch Types
     private refs: any;
-
+    public readonly element?: HTMLElement;
 
     constructor(model: SettingsModel) {
         this.model = model;

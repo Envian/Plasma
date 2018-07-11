@@ -34,7 +34,8 @@
     "@types/node": "latest",
     "@types/atom": "latest",
     "@types/keytar": "latest",
-    "@types/jszip": "latest"
+    "@types/jszip": "latest",
+    "@types/opn": "latest"
   },
   "package-deps": {
     "language-salesforce": ">=0.6.0"

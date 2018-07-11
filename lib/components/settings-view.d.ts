@@ -15,6 +15,7 @@ export default class SettingsView {
     private api;
     private type;
     private refs;
+    readonly element?: HTMLElement;
     constructor(model: SettingsModel);
     onSave(project: Project): void;
     onLoad(project: Project): void;
