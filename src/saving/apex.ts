@@ -1,5 +1,3 @@
-"use babel";
-
 import Project, { FileStatusItem } from "../project.js";
 import ToolingRequest from "../api/tooling/tooling-request.js";
 import Query from "../api/tooling/query.js";

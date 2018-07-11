@@ -1,5 +1,3 @@
-"use babel";
-
 import ToolingRequest from "./tooling-request.js";
 
 // TODO: add crud response type.

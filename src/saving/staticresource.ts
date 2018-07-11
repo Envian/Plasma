@@ -1,11 +1,8 @@
-"use babel";
-
-import { mapby } from "../helpers.js";
 import Project, { FileStatusItem } from "../project.js";
 import ToolingRequest from "../api/tooling/tooling-request.js";
 import Query from "../api/tooling/query.js";
 import CRUDRequest from "../api/tooling/crud-sobject.js";
-import ToolingSave, { CompileResult } from "./tooling-save.js";
+import ToolingSave from "./tooling-save.js";
 import { getText } from "../api/soap-helpers.js";
 import FileInfo from './file-info.js';
 

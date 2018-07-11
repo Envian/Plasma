@@ -1,5 +1,3 @@
-"use babel";
-
 import { setPassword, getPassword } from "keytar";
 import { EventEmitter } from "events";
 import { File, Directory } from "atom";

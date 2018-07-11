@@ -3,7 +3,7 @@ import { RequestOptions, OutgoingHttpHeaders } from "http";
 export default class ToolingRequest<T> {
     error?: Error;
     protected readonly body: any;
-    protected result?: T;
+    result?: T;
     private readonly options;
     private readonly referenceId;
     constructor(options: RequestOptions, body: any, referenceId?: string);

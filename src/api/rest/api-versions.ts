@@ -1,5 +1,3 @@
-"use babel";
-
 import { send } from "../rest-request.js";
 
 export default async function(host: string): Promise<Array<string>> {

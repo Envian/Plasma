@@ -1,5 +1,3 @@
-"use babel";
-
 //import ToolingAPI from "../api/tooling.js";
 import { sleep, groupby, flatten } from "../helpers.js";
 

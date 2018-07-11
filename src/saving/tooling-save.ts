@@ -1,6 +1,4 @@
-"use babel";
-
-import { FindDisplayMarkerOptions, TextEditor, RangeCompatible } from "atom";
+//import { TextEditor, RangeCompatible } from "atom";
 
 import { confirm } from "../helpers.js";
 import Project, { FileStatusItem } from "../project.js";
@@ -124,32 +122,32 @@ export default abstract class ToolingSave {
     async getBody(body: string): Promise<string> { return body; }
 }
 
-function addErrorMarker(editors: Array<TextEditor>, line: number): void {
-    if (line == null || !editors || !editors.length) return;
-
-    for (const editor of editors) {
-        const range: RangeCompatible = [[line, 0], [line, editor.getBuffer().getLines()[line].length]];
-        editor.decorateMarker(editor.markBufferRange(range, {
-            plasma: "compile-error",
-            maintainHistory: true,
-            persistent: false,
-            invalidate: "touch"
-        } as any), {
-            type: "line",
-            class: "plasma-error"
-        });
-
-        editor.decorateMarker(editor.markBufferRange(range, {
-            plasma: "compile-error",
-            maintainHistory: true,
-            persistent: false,
-            invalidate: "never"
-        } as any), {
-            type: "line-number",
-            class: "plasma-error"
-        });
-    }
-}
+// function addErrorMarker(editors: Array<TextEditor>, line: number): void {
+//     if (line == null || !editors || !editors.length) return;
+//
+//     for (const editor of editors) {
+//         const range: RangeCompatible = [[line, 0], [line, editor.getBuffer().getLines()[line].length]];
+//         editor.decorateMarker(editor.markBufferRange(range, {
+//             plasma: "compile-error",
+//             maintainHistory: true,
+//             persistent: false,
+//             invalidate: "touch"
+//         } as any), {
+//             type: "line",
+//             class: "plasma-error"
+//         });
+//
+//         editor.decorateMarker(editor.markBufferRange(range, {
+//             plasma: "compile-error",
+//             maintainHistory: true,
+//             persistent: false,
+//             invalidate: "never"
+//         } as any), {
+//             type: "line-number",
+//             class: "plasma-error"
+//         });
+//     }
+// }
 
 function getName(path: string): string {
     const extn = path.indexOf(".");

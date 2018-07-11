@@ -13,10 +13,10 @@
     "lightning",
     "aura"
   ],
-  "repository": "https://github.com/Envian/plasma",
-  "homepage": "https://github.com/Envian/plasma",
+  "repository": "https://github.com/Envian/Plasma",
+  "homepage": "https://github.com/Envian/Plasma",
   "bugs": {
-    "url": "https://github.com/Envian/plasma"
+    "url": "https://github.com/Envian/Plasma"
   },
   "license": "MIT",
   "engines": {

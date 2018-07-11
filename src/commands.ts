@@ -1,5 +1,3 @@
-"use babel";
-
 import opn = require("opn");
 
 import { File, Directory } from "atom";
@@ -10,6 +8,8 @@ import Project from "./project.js";
 import FileInfo from "./saving/file-info.js";
 
 export default class {
+    private constructor() {}
+
     static async newProject(): Promise<object> {
         const project = await getProjectForAction();
 

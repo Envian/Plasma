@@ -1,5 +1,3 @@
-"use babel";
-
 import { RequestOptions, OutgoingHttpHeaders } from "http";
 import { sendAuth } from "../rest-request.js";
 
@@ -10,7 +8,7 @@ export default class ToolingRequest<T>{
     public error?: Error;
 
     protected readonly body: any;
-    protected result?: T;
+    public result?: T;
     private readonly options: RequestOptions;
     private readonly referenceId: string;
 

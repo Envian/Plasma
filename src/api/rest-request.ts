@@ -1,4 +1,3 @@
-"use babel";
 import { request } from "https";
 import { RequestOptions } from "http";
 import { getError } from "../helpers.js";

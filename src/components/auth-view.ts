@@ -1,5 +1,3 @@
-"use babel";
-
 import { WorkspaceOpenOptions } from "atom";
 
 import { getLoginPath } from "../api/rest/login.js";

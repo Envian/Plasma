@@ -1,5 +1,3 @@
-"use babel";
-
 // TODO: Etch has no typings. for now, import it as any.
 const etch = require("etch") as any;
 import Project from "../project.js";

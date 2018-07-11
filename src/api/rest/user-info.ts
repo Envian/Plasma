@@ -1,5 +1,3 @@
-"use babel";
-
 import { URL } from "url";
 import { send } from "../rest-request.js";
 

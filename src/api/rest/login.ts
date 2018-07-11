@@ -1,5 +1,3 @@
-"use babel";
-
 import { send } from "../rest-request.js";
 
 const CLIENT_ID = "3MVG9g9rbsTkKnAUsShwsp_kK_RHkTCRVKUcbvJuLIwkDpeCSMGmIupQQgcpSo26L_qyQt4HsDXeuvowD5OVs";

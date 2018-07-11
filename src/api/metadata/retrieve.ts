@@ -1,5 +1,3 @@
-"use babel";
-
 import { loadAsync } from "jszip";
 
 import { sleep } from "../../helpers.js";

@@ -1,6 +1,3 @@
-"use babel";
-/// <reference types="atom" />
-
 import { ConfirmationOptions } from "atom";
 
 export function sleep(milliseconds: number): Promise<void> {

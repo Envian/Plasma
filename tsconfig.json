@@ -11,14 +11,15 @@
         "rootDir": "./src",
         "removeComments": true,
         "importHelpers": true,
-        "isolatedModules": true,
         "strict": true,
+        "alwaysStrict": true,
         "noUnusedLocals": true,
-        "noUnusedParameters": true,
+        "noUnusedParameters": false,
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true,
         "moduleResolution": "node",
         "baseUrl": "./src",
+        "esModuleInterop": true
     },
     "include": [
         "./src/**/*.ts",

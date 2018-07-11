@@ -1,4 +1,5 @@
 export default class {
+    private constructor();
     static newProject(): Promise<object>;
     static editProject(): Promise<void>;
     static autoSave(path: string, body: string): Promise<void>;

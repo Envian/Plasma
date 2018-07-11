@@ -1,5 +1,3 @@
-"use babel";
-
 import Project from "./project.js";
 
 import { File, Directory } from "atom";
