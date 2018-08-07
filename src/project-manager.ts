@@ -87,6 +87,18 @@ export function getRoot(fileOrDir: File | Directory): Directory | null {
     return null;
 }
 
+export async function tryLoadProject(root: Directory): Promise<Project | undefined> {
+    const existingProject = projectCache.get(root.getPath());
+    if (existingProject) return existingProject;
+
+    if (await root.getFile("config/plasma.json").exists()) {
+        const project = new Project(root);
+        await project.load();
+        return project;
+    }
+    return undefined;
+}
+
 // When there is no project found, mark this and all parent directories as "known not-projects"
 function addEmptyDirectories(fileOrDir: File | Directory) {
     if (fileOrDir.isFile()) fileOrDir = fileOrDir.getParent();

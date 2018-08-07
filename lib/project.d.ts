@@ -3,6 +3,7 @@ import { EventEmitter } from "events";
 import { File, Directory } from "atom";
 import { findProjectForFile, findProjectForDirectory, getProjectForFilesAndDirs } from "./project-manager.js";
 import { AuthorizationResult, ServerType } from "./components/auth-view.js";
+import { UserInfoResult } from "./api/rest/user-info.js";
 export default class Project extends EventEmitter {
     connection: ConnectionInfo;
     readonly root: Directory;
@@ -14,7 +15,6 @@ export default class Project extends EventEmitter {
     readonly files: FileStatus;
     private loading;
     private _loaded;
-    private _isNew;
     private _files;
     constructor(root: Directory);
     save(): Promise<void>;
@@ -22,7 +22,7 @@ export default class Project extends EventEmitter {
     refreshAPIVersions(): Promise<void>;
     refreshFromServer(): Promise<void>;
     authenticate(type: ServerType): Promise<void>;
-    handleAuthResult(result: AuthorizationResult, type: ServerType): Promise<void>;
+    handleAuthResult(result: AuthorizationResult, type: ServerType, connectionInfo?: [Promise<UserInfoResult>, Promise<string[]>]): Promise<void>;
     reauthenticate(): Promise<String>;
     getToken(): Promise<string | null>;
     getOauth(): Promise<string>;

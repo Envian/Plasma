@@ -1,5 +1,4 @@
 import { WorkspaceOpenOptions } from "atom";
-
 import { getLoginPath } from "../api/rest/login.js";
 
 export async function authorize(type: ServerType, username?: string): Promise<AuthorizationResult> {
@@ -43,7 +42,7 @@ export default class AuthView {
 
         this.webview = document.createElement("webview");
         this.webview.className = "native-key-bindings";
-        this.webview.addEventListener("will-navigate", (event: any) => this.handleResponse(event.url) );
+        this.webview.addEventListener("will-navigate", (event: Event) => this.handleResponse(event as NavigateEvent) );
         this.webview.addEventListener("did-start-loading", () => this.spinner.style.display = "" );
         this.webview.addEventListener("did-frame-finish-load", () => this.spinner.style.display = "none" );
         this.webview.setAttribute("src", baseURL + getLoginPath(options.username));
@@ -54,11 +53,12 @@ export default class AuthView {
         this.element.appendChild(this.webview);
     }
 
-    handleResponse(url: string): void {
-        if (!url.startsWith("plasma://authenticated")) return;
+    handleResponse(event: NavigateEvent): void {
+        if (!event.url.startsWith("plasma://authenticated")) return;
+        event.preventDefault();
 
         // Get the hash if success, search if failure.
-        const targetUrl = new URL(url);
+        const targetUrl = new URL(event.url);
         const paramString = (targetUrl.hash || targetUrl.search).substring(1);
 
         const authParams = paramString.split("&")
@@ -88,6 +88,10 @@ export default class AuthView {
     getTitle(): string {
         return "Salesforce Authentication";
     }
+}
+
+interface NavigateEvent extends Event {
+    url: string;
 }
 
 export interface AuthorizationOptions {

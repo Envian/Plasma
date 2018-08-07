@@ -8,7 +8,7 @@ import { AuthorizationResult, ServerType, authorize } from "./components/auth-vi
 
 import { refreshToken } from "./api/rest/login.js";
 import getApiVersions from "./api/rest/api-versions.js";
-import getUserInfo from "./api/rest/user-info.js";
+import getUserInfo, { UserInfoResult } from "./api/rest/user-info.js";
 import retrieve from "./api/metadata/retrieve.js";
 
 
@@ -32,7 +32,6 @@ export default class Project extends EventEmitter {
 
     private loading: boolean;
     private _loaded: boolean;
-    private _isNew: boolean;
     private _files: FileStatus;
 
     constructor(root: Directory) {
@@ -45,32 +44,28 @@ export default class Project extends EventEmitter {
 
         this.loading = false;
         this._loaded = false;
-        this._isNew = true;
 
         this._files = {};
         this.connection = new ConnectionInfo();
-console.log(this);
+        register(this);
     }
 
     async save(): Promise<void> {
-        // TODO: Saving Check?
+        // TODO: Prevent redundant saves?
         try {
             await this.configFile.create();
+            await this.srcFolder.create();
             await this.configFile.write(JSON.stringify({
                 connection: this.connection,
                 files: this.files
             }, null, 4));
 
-            if (this._isNew) {
-                register(this);
-                this._isNew = false;
-                this._loaded = true;
-            }
-
+            this._loaded = true;
             this.emit("save", this);
         } catch (ex) {
             atom.notifications.addError(`Failed to save project.\nDirectory: ${this.root.getPath()}\nError: ${ex.message}`, {
-                dismissable: true
+                dismissable: true,
+                detail: ex.stack
             });
         }
     }
@@ -90,9 +85,7 @@ console.log(this);
 
             Object.assign(this.connection, saveData.connection);
             Object.assign(this.files, saveData.files);
-            register(this);
 
-            this._isNew = false;
             this._loaded = true;
             this.loading = false;
             this.emit("load", this);
@@ -124,7 +117,6 @@ console.log(this);
             await savePromise;
             atom.notifications.addSuccess("Successfully refreshed from server.");
         } catch (ex) {
-            console.log(ex);
             atom.notifications.addError(`Failed to refresh from server.\nError: ${ex.message}`, {
                 dismissable: true
             });
@@ -137,14 +129,14 @@ console.log(this);
         return this.handleAuthResult(result, type);
     }
 
-    async handleAuthResult(result: AuthorizationResult, type: ServerType): Promise<void> {
+    async handleAuthResult(result: AuthorizationResult, type: ServerType, connectionInfo?: [Promise<UserInfoResult>, Promise<string[]>]): Promise<void> {
         if (result.error === "access_denied") {
             atom.notifications.addWarning("Credentials not updated.");
             return;
         }
 
         const host = new URL(result.instance_url).host;
-        const [userInfo, versions] = await Promise.all([
+        const [userInfo, versions] = await Promise.all(connectionInfo || [
             getUserInfo(result.id, result.token_type + " " + result.access_token),
             getApiVersions(host)
         ]);
@@ -159,9 +151,7 @@ console.log(this);
         this.connection.token_type = result.token_type;
         this.connection.id = result.id;
 
-        if (!this._isNew) {
-            await this.save();
-        }
+        await this.save();
 
         setPassword("plasma-salesforce", result.id, result.access_token);
         setPassword("plasma-salesforce-refresh", result.id, result.refresh_token);

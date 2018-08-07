@@ -28,7 +28,7 @@ export async function activate() {
     subscriptions.add(atom.workspace.addOpener((uri: string, options: any) => {
         const [command, ...path] = uri.split("?")
         switch(command) {
-            case "plasma://editProject": return new SettingsModel(path.join(""));
+            case "plasma://editProject": return new SettingsModel(path && path.join(""));
             case "plasma://authenticate": return new AuthView(options); // Options will also contain the auth opts
         }
         return undefined;

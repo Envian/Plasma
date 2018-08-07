@@ -1,37 +1,47 @@
 import { Directory } from "atom";
+import { EventEmitter } from "events";
 
-import Project, { ConnectionInfo } from "../project.js";
-import { AuthorizationResult, authorize, ServerType } from "./auth-view.js";
+import Project from "../project.js";
+import { authorize, ServerType } from "./auth-view.js";
+import { tryLoadProject } from "../project-manager.js";
 
-export default class SettingsModel {
-    public connection: ConnectionInfo;
+export default class SettingsModel extends EventEmitter {
+    public path: string;
     public project?: Project;
-    private authResult?: AuthorizationResult;
 
     constructor(state?: string | Project) {
-        if (typeof(state) === "string" && state) {
-            this.project = new Project(new Directory(state));
-            this.project.load();
-            this.connection = this.project.connection;
-        } else if (state instanceof Project) {
+        super();
+        // TODO: Figure out why this is required and what we can do about it.
+        this.off = this.removeListener;
+
+        if (state instanceof Project) {
             this.project = state;
-            this.connection = this.project.connection;
+            this.path = this.project.root.getPath();
         } else {
-            this.connection = new ConnectionInfo();
+            this.path = state || "";
+
+            // If a path is provided, try loading the project.
+            // In theory, this should happen faster than a user can do something meaningful in the UI.
+            tryLoadProject(new Directory(this.path))
+                .then((project?: Project) => {
+                    if (project) {
+                        this.project = project;
+                        this.path = this.project.root.getPath();
+                        this.emit("reload");
+                    } else {
+                        throw Error("Project not found: " + state);
+                    }
+                });
         }
     }
 
     async authenticate(type: ServerType): Promise<void> {
-        const result = await authorize(type, this.connection.username);
-        if (this.project) {
-            this.project.handleAuthResult(result, type);
-        } else {
-            this.authResult = result;
-        }
+        if (!this.project) throw Error("Project is not loaded");
+        this.project.handleAuthResult(await authorize(type, this.project.connection.username), type);
     }
 
-    async getAPIVersions(): Promise<void> {
-        if (!this.project) return;
+    async refreshAPIVersions(): Promise<void> {
+        if (!this.project) throw Error("Project is not loaded");
 
         try {
             await this.project.refreshAPIVersions();
@@ -44,14 +54,9 @@ export default class SettingsModel {
         }
     }
 
-    async save(api: string, path: string) {
-        if (!this.project) {
-            this.project = new Project(new Directory(path));
-            this.project.connection = Object.assign({}, this.connection);
-            if (this.authResult) {
-                await this.project.handleAuthResult(this.authResult, this.connection.type);
-            }
-        }
+    async save(api: string) {
+        if (!this.project) throw Error("Project is not loaded");
+
         this.project.connection.api = api;
         try {
             await this.project.save();
@@ -64,18 +69,14 @@ export default class SettingsModel {
         }
     }
 
-
     // TODO: Figure out better typing here.
     serialize(): any {
-        if (!this.project) {
-            // Don't restore this window if the project has not been saved.
-            return null;
-        } else {
-            return {
-                deserializer: "SettingsModel",
-                data: this.project.root.getPath()
-            };
-        }
+        if (!this.project) return null;
+
+        return {
+            deserializer: "SettingsModel",
+            data: this.project.root.getPath()
+        };
     }
 
     getTitle(): string {

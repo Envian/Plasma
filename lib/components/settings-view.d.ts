@@ -11,7 +11,6 @@ declare global {
 }
 export default class SettingsView {
     private model;
-    private path;
     private api;
     private type;
     private refs;
@@ -26,5 +25,4 @@ export default class SettingsView {
     doAuthenticate(): Promise<void>;
     doUpdateAPI(): Promise<void>;
     doSave(): Promise<void>;
-    onPathUpdate(): void;
 }

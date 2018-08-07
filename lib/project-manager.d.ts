@@ -5,3 +5,4 @@ export declare function findProjectForFile(file: File): Promise<Project | null>;
 export declare function findProjectForDirectory(directory: Directory): Promise<Project | null>;
 export declare function getProjectForFilesAndDirs(filesOrDirs: Array<File | Directory>): Promise<Project | null>;
 export declare function getRoot(fileOrDir: File | Directory): Directory | null;
+export declare function tryLoadProject(root: Directory): Promise<Project | undefined>;

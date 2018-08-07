@@ -11,11 +11,14 @@ export default class AuthView {
     private readonly element;
     private readonly webview;
     constructor(options: AuthorizationOptions);
-    handleResponse(url: string): void;
+    handleResponse(event: NavigateEvent): void;
     serialize(): void;
     destroy(): void;
     getElement(): Element;
     getTitle(): string;
+}
+interface NavigateEvent extends Event {
+    url: string;
 }
 export interface AuthorizationOptions {
     type: ServerType;
@@ -31,3 +34,4 @@ export interface AuthorizationResult {
     access_token: string;
     refresh_token: string;
 }
+export {};

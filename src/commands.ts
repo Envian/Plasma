@@ -2,7 +2,7 @@ import opn = require("opn");
 
 import { File, Directory } from "atom";
 
-import { getRoot, getProjectForFilesAndDirs } from "./project-manager.js";
+import { getRoot, getProjectForFilesAndDirs, findProjectForDirectory } from "./project-manager.js";
 import saveFiles from "./saving/save-manager.js";
 import Project from "./project.js";
 import FileInfo from "./saving/file-info.js";
@@ -10,21 +10,24 @@ import FileInfo from "./saving/file-info.js";
 export default class {
     private constructor() {}
 
-    static async newProject(): Promise<object> {
-        const project = await getProjectForAction();
+    static async newProject(): Promise<object | void> {
+        const selectedPaths = await new Promise((accept: (value: string[] | null) => void) => atom.pickFolder(accept));
+        if (selectedPaths && selectedPaths.length) {
+            const dir = new Directory(selectedPaths[0]);
+            const existingProject = await findProjectForDirectory(dir);
 
-        // Don't create projects over others.
-        if (project) {
-            return atom.workspace.open("plasma://editProject");
-        }
+            if (existingProject) {
+                atom.notifications.addError("Project already defined at this location. Select a new directory for your project.");
+                return;
+            }
 
-        const target = getFilesAndDirsForAction();
-        if (target && target.length === 1) {
-            const root = getRoot(target[0]) || target[0];
+            const root = getRoot(dir) || dir;
+            const project = new Project(root);
+            await project.save();
+
+            // Typing fix. project will just be passed through and ignored.
             return atom.workspace.open("plasma://editProject?" + root.getPath());
         }
-
-        return atom.workspace.open("plasma://editProject");
     }
 
     static async editProject(): Promise<void> {
