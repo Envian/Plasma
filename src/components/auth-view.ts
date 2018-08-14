@@ -90,7 +90,7 @@ export default class AuthView {
     }
 }
 
-interface NavigateEvent extends Event {
+export interface NavigateEvent extends Event {
     url: string;
 }
 
