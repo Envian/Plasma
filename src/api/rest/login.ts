@@ -1,4 +1,4 @@
-import { send } from "../rest-request.js";
+import { trySend } from "../rest-request.js";
 
 const CLIENT_ID = "3MVG9g9rbsTkKnAUsShwsp_kK_RHkTCRVKUcbvJuLIwkDpeCSMGmIupQQgcpSo26L_qyQt4HsDXeuvowD5OVs";
 
@@ -34,7 +34,8 @@ export async function refreshToken(host: string, token: string): Promise<Refresh
         method: "POST",
         path: "/services/oauth2/token"
     };
-    return send<RefreshResult>(options, body);
+    // Will not 204
+    return trySend<RefreshResult>(options, body) as Promise<RefreshResult>;
 }
 
 export interface RefreshResult {

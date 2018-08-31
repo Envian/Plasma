@@ -1,13 +1,13 @@
-import Project, { FileStatusItem } from "../project.js";
-import ToolingRequest from "../api/tooling/tooling-request.js";
-import Query from "../api/tooling/query.js";
-import CRUDRequest from "../api/tooling/crud-sobject.js";
-import ToolingSave from "./tooling-save.js";
-import { getText } from "../api/soap-helpers.js";
-import FileInfo from './file-info.js';
+import Project, { FileStatusItem } from '../project';
+import FileInfo from './file-info';
+import Query from '../api/tooling/query';
+import CRUDRequest from '../api/tooling/crud-sobject';
+import { getText } from '../api/soap-helpers';
+import ToolingRequest from '../api/tooling/tooling-request';
+import ToolingStandaloneSave from './tooling-standalone';
+import { CompileResult } from './tooling-save';
 
-
-export default class StaticResourceSave extends ToolingSave {
+export default class StaticResource extends ToolingStandaloneSave {
     private readonly path: string;
     private readonly state?: FileStatusItem;
     private readonly source?: FileInfo;
@@ -53,7 +53,7 @@ export default class StaticResourceSave extends ToolingSave {
         }
     }
 
-    async getSaveRequest(containerId: string): Promise<Array<ToolingRequest<any>>> {
+    async getSaveRequests(): Promise<Array<ToolingRequest<any>>> {
         let attributes;
 
         if (this.metadata) {
@@ -85,14 +85,11 @@ export default class StaticResourceSave extends ToolingSave {
                 ContentType: attributes && attributes.contentType
             }
         });
-        return [this.saveRequest as CRUDRequest<any>];
+        return [this.saveRequest];
     }
 
-    async handleSaveResult() {
 
-    }
-
-    async getBody(url: string): Promise<string> {
-        return "TODO: Fix server copies of static resources";
+    async handleSaveResult(results?: Array<CompileResult>): Promise<void> {
+        console.log(results);
     }
 }

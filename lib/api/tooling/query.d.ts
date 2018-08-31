@@ -1,8 +1,9 @@
 import ToolingRequest from "./tooling-request.js";
-export default class Query extends ToolingRequest<Array<any>> {
+export default class Query extends ToolingRequest<Array<Record>> {
     constructor(query: string, referenceId?: string);
-    translateResponse(rawResponse: QueryResult): Array<any>;
+    handleResponse(rawResponse: QueryResult, statusCode: number): void;
 }
 export interface QueryResult {
-    records: Array<any>;
+    records: Array<Record>;
 }
+export declare type Record = any;

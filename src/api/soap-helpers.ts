@@ -1,3 +1,5 @@
+import Project from '../project';
+
 const INVALID_SESSION = "INVALID_SESSION";
 const SOAP_NAMESPACES: {[index:string]: string} = {
     "soapenv": "http://schemas.xmlsoap.org/soap/envelope/",
@@ -7,8 +9,7 @@ const NAMESPACE_RESOLVER: XPathNSResolver = {
     lookupNamespaceURI: prefix => SOAP_NAMESPACES[prefix] || ""
 };
 
-// TODO: Fix project typing
-export async function soapRequest(project: any, body: Element | Array<Element>): Promise<Document> {
+export async function soapRequest(project: Project, body: Element | Array<Element>): Promise<Document> {
 console.log(body);
     const sessionElement = xmldom("met:sessionId", await project.getToken());
     const requestBody = xmldoc(

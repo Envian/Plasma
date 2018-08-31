@@ -1,5 +1,4 @@
 import Project, { FileStatusItem } from "../project.js";
-import ToolingRequest from "../api/tooling/tooling-request.js";
 import Query from "../api/tooling/query.js";
 import FileInfo from './file-info.js';
 export default abstract class ToolingSave {
@@ -8,17 +7,14 @@ export default abstract class ToolingSave {
     protected readonly name: string;
     protected readonly folder: string;
     protected readonly files: Array<FileInfo>;
+    errorMessage?: string;
     skip: boolean;
-    success: boolean;
     constructor(project: Project, entity: string, savedFiles: Array<FileInfo>);
     abstract getConflictQuery(): Query;
     abstract handleConflicts(): Promise<void>;
-    abstract getSaveRequest(containerId: string): Promise<Array<ToolingRequest<any>>>;
-    abstract handleSaveResult(results?: Array<CompileResult>): Promise<void>;
     handleConflictWithServer(serverRecord: ServerFileInformation): Promise<void>;
     handleConflictsMissingFromServer(localState?: FileStatusItem): Promise<void>;
     overwritePrompt(options: ServerFileInformation): Promise<void>;
-    getBody(body: string): Promise<string>;
 }
 export interface CompileResult {
     fileName: string;
@@ -34,7 +30,7 @@ export interface ServerFileInformation {
     modifiedDate: string;
     id: string;
     type: string;
-    body: string;
+    body: string | (() => Promise<string>);
     path: string;
     name: string;
     localState?: FileStatusItem;

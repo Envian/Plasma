@@ -13,5 +13,6 @@ export default class ApexSave extends ToolingSave {
     getConflictQuery(): Query;
     handleConflicts(): Promise<void>;
     getSaveRequest(containerId: string): Promise<Array<ToolingRequest<any>>>;
+    handleErrorMessages(results?: Array<CompileResult>): Promise<string>;
     handleSaveResult(results?: Array<CompileResult>): Promise<void>;
 }

@@ -1,14 +1,15 @@
-import Project from "../project.js";
-import ToolingRequest from "../api/tooling/tooling-request.js";
-import Query from "../api/tooling/query.js";
-import ToolingSave, { CompileResult } from "./tooling-save.js";
-export default class AuraSave extends ToolingSave {
-    private readonly metadata?;
-    private readonly query;
+import Project from '../project';
+import Query from '../api/tooling/query';
+import ToolingRequest from '../api/tooling/tooling-request';
+import ToolingStandaloneSave from './tooling-standalone';
+export default class Aura extends ToolingStandaloneSave {
+    private metadata?;
+    readonly query: Query;
     private savesByType;
+    private bundleId?;
     constructor(project: Project, entity: string, savedFiles: Array<any>);
     getConflictQuery(): Query;
     handleConflicts(): Promise<void>;
-    getSaveRequest(containerId: string): Promise<Array<ToolingRequest<any>>>;
-    handleSaveResult(results?: Array<CompileResult>): Promise<void>;
+    getSaveRequests(): Promise<Array<ToolingRequest<any>>>;
+    handleSaveResult(): Promise<void>;
 }

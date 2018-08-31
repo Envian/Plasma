@@ -1,5 +1,5 @@
 import { URL } from "url";
-import { send } from "../rest-request.js";
+import { trySend } from "../rest-request.js";
 
 export default async function(id: string, token: string): Promise<UserInfoResult> {
     const fullUrl = new URL(id);
@@ -9,7 +9,8 @@ export default async function(id: string, token: string): Promise<UserInfoResult
         method: "GET",
         headers: { Authorization: token }
     };
-    return send<UserInfoResult>(options);
+    // Will not 204
+    return trySend<UserInfoResult>(options) as Promise<UserInfoResult>;
 }
 
 export interface UserInfoResult {

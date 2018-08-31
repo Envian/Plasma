@@ -1,5 +1,5 @@
 import ToolingRequest from "./tooling-request.js";
-export default class CRUDRequest<T> extends ToolingRequest<T> {
+export default class CRUDRequest<T extends CRUDResult> extends ToolingRequest<T> {
     constructor(options: CRUDOptions);
 }
 export interface CRUDOptions {
@@ -8,4 +8,10 @@ export interface CRUDOptions {
     id?: string;
     body?: any;
     referenceId?: string;
+}
+export interface CRUDResult {
+    id: string;
+    success: boolean;
+    errors: Array<undefined>;
+    warnings: Array<undefined>;
 }

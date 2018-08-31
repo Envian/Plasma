@@ -1,6 +1,6 @@
 import Project from "../project.js";
 import SettingsModel from "./settings-model.js";
-declare global {
+declare global  {
     namespace JSX {
         interface Element {
         }

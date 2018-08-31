@@ -2,7 +2,6 @@
 
 import { confirm } from "../helpers.js";
 import Project, { FileStatusItem } from "../project.js";
-import ToolingRequest from "../api/tooling/tooling-request.js";
 import Query from "../api/tooling/query.js";
 import FileInfo from './file-info.js';
 
@@ -13,8 +12,8 @@ export default abstract class ToolingSave {
     protected readonly name: string;
     protected readonly folder: string;
     protected readonly files: Array<FileInfo>; // TODO: Need a wrapper class for the saved file.
+    public errorMessage?: string;
     public skip: boolean;
-    public success: boolean;
 
     constructor(project: Project, entity: string, savedFiles: Array<FileInfo>) {
         this.project = project;
@@ -24,7 +23,6 @@ export default abstract class ToolingSave {
         this.files = savedFiles;
 
         this.skip = false;
-        this.success = false;
     }
 
     // Returns a query that gets the state of the file on the server.
@@ -33,10 +31,6 @@ export default abstract class ToolingSave {
     // Handles the result of query called in getConflictQuery.
     abstract async handleConflicts(): Promise<void>;
 
-    // Generates a list of save requests to save the changes made to this entity.
-    abstract async getSaveRequest(containerId: string): Promise<Array<ToolingRequest<any>>>;
-
-    abstract async handleSaveResult(results?: Array<CompileResult>): Promise<void>;
     // async handleSaveResult(results?: Array<CompileResult>): Promise<void> {
     //     console.log(results);
     //     const editors = atom.workspace.getTextEditors().filter(editor => editor.getPath() === this.project.srcFolder.getFile(this.path).getPath());
@@ -74,7 +68,15 @@ export default abstract class ToolingSave {
     async handleConflictWithServer(serverRecord: ServerFileInformation) {
         if (serverRecord.localState) {
             if (Date.parse(serverRecord.localState.lastSyncDate) < Date.parse(serverRecord.modifiedDate)) {
-                return this.overwritePrompt(serverRecord);
+                await this.overwritePrompt(serverRecord);
+                
+                // Always make sure that the ID we have stored locally matches the server.
+                const localFile = this.project.files[serverRecord.path] || {};
+                this.project.files[serverRecord.path] = Object.assign(localFile, {
+                    id: serverRecord.id,
+                    lastSyncDate: localFile.lastSyncDate || "1970-1-1",
+                    type: serverRecord.type
+                });
             }
         } else {
             return this.overwritePrompt(serverRecord);
@@ -104,12 +106,7 @@ export default abstract class ToolingSave {
                 this.skip = false;
                 return;
             case 1: // Server copy
-                this.project.srcFolder.getFile(options.path).write(await this.getBody(options.body));
-                this.project.files[options.path] = Object.assign(this.project.files[options.path] || {}, {
-                    id: options.id,
-                    lastSyncDate: options.modifiedDate,
-                    type: options.type
-                });
+                this.project.srcFolder.getFile(options.path).write(typeof(options.body) === "string" ? options.body : await options.body());
                 this.skip = true;
                 return;
             case 2: // Skip
@@ -117,9 +114,6 @@ export default abstract class ToolingSave {
                 return;
         }
     }
-
-    // Static resources require a request to get the body
-    async getBody(body: string): Promise<string> { return body; }
 }
 
 // function addErrorMarker(editors: Array<TextEditor>, line: number): void {
@@ -169,7 +163,7 @@ export interface ServerFileInformation {
     modifiedDate: string;
     id: string;
     type: string;
-    body: string;
+    body: string | (() => Promise<string>);
     path: string;
     name: string;
     localState?: FileStatusItem;

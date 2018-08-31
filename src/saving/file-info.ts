@@ -20,7 +20,7 @@ export default class FileInfo {
     constructor(project: Project, path: File | string, body?: string) {
         path = ((path instanceof File) ? path.getPath() : path).replace(/\\/g, "/");
         this.project = project;
-        this.path = project.srcFolder.relativize(path);
+        this.path = project.srcFolder.relativize(path).replace(/\\/g, "/");
         this.entity = getEntityName(this.path);
         this.folderName = this.path.substr(0, this.path.indexOf("/"));
         this.isTooling = TOOLING_FOLDERS.has(this.folderName);

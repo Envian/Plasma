@@ -1,9 +1,10 @@
-import { send } from "../rest-request.js";
+import { trySend } from "../rest-request.js";
 
 export default async function(host: string): Promise<Array<string>> {
-    return (await send<Array<APIResponseItem>>(
+    return (await trySend<Array<APIResponseItem>>(
         { host, path: "/services/data" }
-    )).map(api => api.version).reverse();
+    ) as Array<APIResponseItem>).map(api => api.version).reverse();
+    // Will not 204
 }
 
 interface APIResponseItem {

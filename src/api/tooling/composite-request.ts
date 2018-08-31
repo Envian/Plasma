@@ -1,7 +1,7 @@
-import ToolingRequest from "./tooling-request.js";
-import { getError } from "../../helpers.js";
+import ToolingRequest, { CompositeRequestItem } from "./tooling-request.js";
+import Project from '../../project.js';
 
-export default class CompositeRequest extends ToolingRequest<Array<CompositeRequestResultItem>> {
+export default class CompositeRequest extends ToolingRequest<Array<CompositeRequestResultItem<any>>> {
     private readonly requests: Array<ToolingRequest<any>>;
 
     constructor(allOrNothing: boolean, requests?: Array<ToolingRequest<any>>) {
@@ -17,41 +17,36 @@ export default class CompositeRequest extends ToolingRequest<Array<CompositeRequ
     }
 
     add(request : ToolingRequest<any>): void {
-        if (this.requests.length === 25) {
+        if (this.requests.length >= 25) {
             throw Error("Only 25 requests are allowed in a single composite request.");
         }
         this.requests.push(request);
     }
 
-    translateResponse(rawResponse: CompositeRequestResult): Array<CompositeRequestResultItem> {
+    handleResponse(rawResponse: CompositeRequestResult<any>, statusCode: number): void {
+        // TODO: Handle possible errors.
+        this.result = rawResponse.compositeResponse;
         rawResponse.compositeResponse.forEach((response, index) => {
             const request = this.requests[index];
-            switch (response.httpStatusCode) {
-                case 200:
-                case 201:
-                case 204:
-                    request.result = request.translateResponse(response.body);
-                    break;
-                default:
-                    request.error = Error(getError(response.body));
-                    break;
-            }
+            request.handleResponse(response.body, response.httpStatusCode);
         });
-        return rawResponse.compositeResponse;
     }
 
-    // TODO: Project typing.
-    async send(project: any): Promise<Array<CompositeRequestResultItem>> {
+    getSubrequest(project: Project): CompositeRequestItem {
+        throw Error("Unable to nest composite requests.");
+    }
+
+    async send(project: Project): Promise<Array<CompositeRequestResultItem<any>>> {
         this.body.compositeRequest = this.requests.map(request => request.getSubrequest(project));
-        return super.send(project)
+        return super.send(project) as Promise<Array<CompositeRequestResultItem<any>>>;
     }
 }
 
-export interface CompositeRequestResult {
-    compositeResponse: Array<CompositeRequestResultItem>
+export interface CompositeRequestResult<T> {
+    compositeResponse: Array<CompositeRequestResultItem<T>>
 }
 
-export interface CompositeRequestResultItem {
-    body: any,
+export interface CompositeRequestResultItem<T> {
+    body: Array<Error | T>,
     httpStatusCode: number
 }

@@ -3,7 +3,7 @@ export declare enum ServerType {
     Sandbox = "Sandbox",
     Production = "Production",
     Developer = "Developer",
-    Preview = "Preview"
+    Preview = "Preview",
 }
 export default class AuthView {
     private readonly callback;
@@ -17,7 +17,7 @@ export default class AuthView {
     getElement(): Element;
     getTitle(): string;
 }
-interface NavigateEvent extends Event {
+export interface NavigateEvent extends Event {
     url: string;
 }
 export interface AuthorizationOptions {
@@ -34,4 +34,3 @@ export interface AuthorizationResult {
     access_token: string;
     refresh_token: string;
 }
-export {};

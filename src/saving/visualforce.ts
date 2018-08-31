@@ -98,6 +98,10 @@ export default class VisualforceSave extends ToolingSave {
         })];
     }
 
+    async handleErrorMessages(results?: Array<CompileResult>): Promise<string> {
+        return "oh noes";
+    }
+
     async handleSaveResult(results?: Array<CompileResult>): Promise<void> {
 
     }

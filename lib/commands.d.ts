@@ -1,4 +1,4 @@
-export default class {
+export default class  {
     private constructor();
     static newProject(): Promise<object | void>;
     static editProject(): Promise<void>;

@@ -2,12 +2,11 @@ import { loadAsync } from "jszip";
 
 import { sleep } from "../../helpers.js";
 import { soapRequest, getText, getNode, getNodes, xmldom } from "../soap-helpers.js";
-import { FileStatus } from "../../project.js";
+import Project, { FileStatus } from "../../project.js";
 
-// TODO: Fix project typing
-export default async function retrieve(project : any) : Promise<RetreiveResult> {
+export default async function retrieve(project : Project) : Promise<RetreiveResult> {
     // TODO: Support a missing package xml.
-    const packageXml = new DOMParser().parseFromString(await project.packageXml.read(true), "text/xml");
+    const packageXml = new DOMParser().parseFromString(await project.packageXml.read(true) as string, "text/xml");
     const rootNode = packageXml.firstChild as Element;
 
     const versionNode = getNode(packageXml, "//met:version")

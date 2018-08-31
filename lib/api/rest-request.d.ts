@@ -1,4 +1,7 @@
 /// <reference types="node" />
 import { RequestOptions } from "http";
-export declare function sendAuth<T>(project: any, options: RequestOptions, body?: any): Promise<T>;
-export declare function send<T>(options: RequestOptions, body?: any): Promise<T>;
+import Project from '../project.js';
+export declare function sendAuth<T>(project: Project, options: RequestOptions, body?: any): Promise<[T | null, number]>;
+export declare function trySendAuth<T>(project: Project, options: RequestOptions, body?: any): Promise<T | null>;
+export declare function send<T>(options: RequestOptions, body?: any): Promise<[T | null, number]>;
+export declare function trySend<T>(options: RequestOptions, body?: any): Promise<T | null>;

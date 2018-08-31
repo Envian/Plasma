@@ -1,20 +1,22 @@
 import ToolingRequest from "./tooling-request.js";
 
-//TODO: add query result type.
-export default class Query extends ToolingRequest<Array<any>> {
+export default class Query extends ToolingRequest<Array<Record>> {
     constructor(query: string, referenceId?: string) {
         super({ method: "GET", path: "/query/?q=" + encodeQuery(query) }, referenceId);
     }
 
-    translateResponse(rawResponse: QueryResult): Array<any> {
-        return rawResponse.records;
+    handleResponse(rawResponse: QueryResult, statusCode: number): void {
+        this.result = rawResponse.records;
+        this.statusCode = statusCode;
     }
 }
 
-function encodeQuery(query : string) {
-    encodeURIComponent(query.replace(/\s+/g, " ").trim());
+function encodeQuery(query: string): string {
+    return encodeURIComponent(query.replace(/\s+/g, " ").trim());
 }
 
 export interface QueryResult {
-    records: Array<any>;
+    records: Array<Record>;
 }
+
+export type Record = any;

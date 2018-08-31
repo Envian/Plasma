@@ -1,5 +1,6 @@
 import { RequestOptions, OutgoingHttpHeaders } from "http";
 import { sendAuth } from "../rest-request.js";
+import Project from '../../project.js';
 
 let counter = 0;
 function UNIQUE_REFERENCE() { return "Unused_Reference_" + counter++; }
@@ -9,6 +10,7 @@ export default class ToolingRequest<T>{
 
     protected readonly body: any;
     public result?: T;
+    public statusCode?: number;
     private readonly options: RequestOptions;
     private readonly referenceId: string;
 
@@ -19,12 +21,13 @@ export default class ToolingRequest<T>{
     }
 
     // When overloaded, translates the raw response from the server into a more useful response.
-    translateResponse(rawResponse: any): T {
-        return rawResponse as T;
+    handleResponse(rawResponse: any, statusCode: number): void {
+        this.result = rawResponse;
+        this.statusCode = statusCode;
     }
 
-    // TODO: Fix project typing.
-    getSubrequest(project: any): CompositeRequestItem {
+    // Returns a subrequest for use in composite requests.
+    getSubrequest(project: Project): CompositeRequestItem {
         return {
             body: this.body,
             url: `/services/data/v${project.apiVersion}/tooling` + this.options.path,
@@ -34,12 +37,12 @@ export default class ToolingRequest<T>{
         }
     }
 
-    // TODO: Fix project typing.
-    async send(project: any): Promise<T> {
+    async send(project: Project): Promise<T | null> {
         this.options.path = `/services/data/v${project.apiVersion}/tooling` + this.options.path;
         try {
-            this.result = this.translateResponse(await sendAuth(this.options, this.body, project));
-            return this.result;
+            const [result, statusCode] = await sendAuth<T>(project, this.options, this.body);
+            this.handleResponse(result, statusCode);
+            return result;
         } catch (error) {
             throw error;
         }

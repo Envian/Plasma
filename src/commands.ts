@@ -3,7 +3,7 @@ import opn = require("opn");
 import { File, Directory } from "atom";
 
 import { getRoot, getProjectForFilesAndDirs, findProjectForDirectory } from "./project-manager.js";
-import saveFiles from "./saving/save-manager.js";
+import { saveFiles } from "./saving/save-manager.js";
 import Project from "./project.js";
 import FileInfo from "./saving/file-info.js";
 
@@ -43,8 +43,6 @@ export default class {
 
 
     static async autoSave(path: string, body: string): Promise<void> {
-        //return; // TEMP: Disabling auto save.
-
         const project = await getProjectForAction();
         if (project) {
             saveFiles(project, [new FileInfo(project, path, body)]);
