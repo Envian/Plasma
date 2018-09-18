@@ -5,23 +5,21 @@ import CRUDRequest from '../api/tooling/crud-sobject';
 import { getText } from '../api/soap-helpers';
 import ToolingRequest from '../api/tooling/tooling-request';
 import ToolingStandaloneSave from './tooling-standalone';
-import { CompileResult } from './tooling-save';
 
 export default class StaticResource extends ToolingStandaloneSave {
-    private readonly path: string;
     private readonly state?: FileStatusItem;
     private readonly source?: FileInfo;
-    private readonly metadata?: FileInfo;
+    private metadata?: FileInfo;
     private readonly query: Query;
     private saveRequest?: CRUDRequest<any>;
+    private resourceId?: string;
 
     constructor(project: Project, entity: string, savedFiles: Array<any>) {
         super(project, entity, savedFiles);
 
-        this.path = entity + ".resource";
-        this.state = project.files[this.path];
-        this.source = savedFiles.find(file => !file.path.endsWith("-meta.xml"));
-        this.metadata = savedFiles.find(file => file.path.endsWith("-meta.xml"));
+        this.state = project.files[this.entity];
+        this.metadata = savedFiles.find(file => file.isMetadata);
+        this.source = savedFiles.find(file => !file.isMetadata) || new FileInfo(project, this.entity);
 
         const whereClause = this.state ? `Id = '${this.state.id}'` : `Name = '${this.name}'`;
         this.query = new Query(`
@@ -38,6 +36,7 @@ export default class StaticResource extends ToolingStandaloneSave {
     async handleConflicts(): Promise<void> {
         const queryResult = await this.query.getResult();
         if (queryResult.length) {
+            this.resourceId = queryResult[0].Id;
             return this.handleConflictWithServer({
                 modifiedBy: queryResult[0].LastModifiedBy.Name,
                 modifiedDate: queryResult[0].LastModifiedDate,
@@ -45,7 +44,7 @@ export default class StaticResource extends ToolingStandaloneSave {
                 type: "StaticResource",
                 body: queryResult[0].Body,
                 localState: this.state,
-                path: this.path,
+                path: this.entity,
                 name: this.name
             });
         } else {
@@ -56,31 +55,38 @@ export default class StaticResource extends ToolingStandaloneSave {
     async getSaveRequests(): Promise<Array<ToolingRequest<any>>> {
         let attributes;
 
-        if (this.metadata) {
-            if (this.metadata.body) {
-                const metadataFile = new DOMParser().parseFromString(await this.metadata.read(), "text/xml");
-                attributes = {
-                    cacheControl: getText(metadataFile, "//met:cacheControl/text()"),
-                    contentType: getText(metadataFile, "//met:contentType/text()")
-                };
-            } else {
-                // TODO: What do we do about brand new static resources?
-                throw Error("New static resources must have a meta xml provided.")
-                // this.metadata.attributes = {
-                //     cacheControl: "private",
-                //     contentType: "image/meme-macro"
-                // };
-                // await this.project.srcFolder.getFile(this.metadata.path)
-                //     .write(getDefaultMetadata(this.project.apiVersion, this.type));
+        // Check if we need to create the metadata file (aka new file)
+        if (!this.metadata && !this.resourceId) {
+            const metadataFile = new FileInfo(this.project, this.entity + "-meta.xml");
+            if (await metadataFile.exists()) {
+                this.metadata = metadataFile;
             }
+        }
+
+        if (this.metadata) {
+            const metadataFile = new DOMParser().parseFromString(await this.metadata.read(), "text/xml");
+            attributes = {
+                cacheControl: getText(metadataFile, "//met:cacheControl/text()"),
+                contentType: getText(metadataFile, "//met:contentType/text()")
+            };
+        } else if (!this.resourceId) {
+            // TODO: What do we do about brand new static resources?
+            throw Error("New static resources must include a -meta.xml file.")
+            // this.metadata.attributes = {
+            //     cacheControl: "private",
+            //     contentType: "image/meme-macro"
+            // };
+            // await this.project.srcFolder.getFile(this.metadata.path)
+            //     .write(getDefaultMetadata(this.project.apiVersion, this.type));
         }
 
         this.saveRequest = new CRUDRequest({
             sobject: "StaticResource",
-            method: this.state ? "PATCH" : "POST",
-            id: this.state && this.state.id,
+            method: this.resourceId ? "PATCH" : "POST",
+            id: this.resourceId,
             body: {
                 Body: this.source && btoa(unescape(encodeURIComponent(await this.source.read()))),
+                Name: this.name,
                 CacheControl: attributes && attributes.cacheControl,
                 ContentType: attributes && attributes.contentType
             }
@@ -89,7 +95,19 @@ export default class StaticResource extends ToolingStandaloneSave {
     }
 
 
-    async handleSaveResult(results?: Array<CompileResult>): Promise<void> {
-        console.log(results);
+    async handleSaveResult(): Promise<void> {
+        const result = this.saveRequest && this.saveRequest.result;
+        if (result && result.length && !result[0].success) {
+            // Static resources have no content validation. Any errores apply to the entire file.
+            this.errorMessage = `${this.entity}:\n  ${result[0].message.replace(/\n/g, "\n  ")}`;
+        } else {
+            this.project.files[this.entity] = Object.assign(this.project.files[this.entity] || {}, {
+                lastSyncDate: new Date().toISOString(),
+                type: "StaticResource"
+            });
+            if (result && result.id) {
+                this.project.files[this.entity].id = result.id;
+            }
+        }
     }
 }

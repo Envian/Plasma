@@ -16,7 +16,7 @@ export default class Aura extends ToolingStandaloneSave {
     constructor(project: Project, entity: string, savedFiles: Array<any>) {
         super(project, entity,  savedFiles);
 
-        this.metadata = savedFiles.find(file => file.path.endsWith("xml"));
+        this.metadata = savedFiles.find(file => file.isMetadata);
         this.query = new Query(`
             SELECT Id, DefType, Source, LastModifiedBy.Name, LastModifiedDate, AuraDefinitionBundleId
             FROM AuraDefinition
@@ -123,7 +123,7 @@ export default class Aura extends ToolingStandaloneSave {
                     Source: file.body,
                     DefType: type,
                     Format: TYPE_TO_FORMAT[type],
-                    AuraDefinitionBundleId: this.bundleId || `@{${this.name}_bundleId.id}`
+                    AuraDefinitionBundleId: this.bundleId ? undefined : `@{${this.name}_bundleId.id}`
                 }
             });
             this.savesByType[type] = request;

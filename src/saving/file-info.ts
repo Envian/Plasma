@@ -39,6 +39,10 @@ export default class FileInfo {
         this.body = body;
         await this.project.srcFolder.getFile(this.path).write(body);
     }
+
+    async exists(): Promise<boolean> {
+        return this.project.srcFolder.getFile(this.path).exists();
+    }
 }
 
 // Gets the entity name this file belongs to from the path.

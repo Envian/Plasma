@@ -11,4 +11,5 @@ export default class FileInfo {
     constructor(project: Project, path: File | string, body?: string);
     read(): Promise<string>;
     write(body: string): Promise<void>;
+    exists(): Promise<boolean>;
 }
