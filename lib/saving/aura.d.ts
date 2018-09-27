@@ -9,7 +9,7 @@ export default class Aura extends ToolingStandaloneSave {
     private bundleId?;
     constructor(project: Project, entity: string, savedFiles: Array<any>);
     getConflictQuery(): Query;
-    handleConflicts(): Promise<void>;
+    handleQueryResult(): Promise<void>;
     getSaveRequests(): Promise<Array<ToolingRequest<any>>>;
     handleSaveResult(): Promise<void>;
 }

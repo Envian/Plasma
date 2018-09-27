@@ -11,7 +11,7 @@ export default class StaticResource extends ToolingStandaloneSave {
     private resourceId?;
     constructor(project: Project, entity: string, savedFiles: Array<any>);
     getConflictQuery(): Query;
-    handleConflicts(): Promise<void>;
+    handleQueryResult(): Promise<void>;
     getSaveRequests(): Promise<Array<ToolingRequest<any>>>;
     handleSaveResult(): Promise<void>;
 }

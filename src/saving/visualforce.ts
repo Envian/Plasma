@@ -2,11 +2,12 @@ import Project, { FileStatusItem } from "../project.js";
 import ToolingRequest from "../api/tooling/tooling-request.js";
 import Query from "../api/tooling/query.js";
 import CRUDRequest from "../api/tooling/crud-sobject.js";
-import ToolingSave, { CompileResult } from "./tooling-save.js";
 import { getText } from "../api/soap-helpers.js";
 import FileInfo from './file-info.js';
+import ToolingContainerSave from './tooling-container.js';
+import { ComponentMessage } from './save-manager.js';
 
-export default class VisualforceSave extends ToolingSave {
+export default class VisualforceSave extends ToolingContainerSave {
     private readonly type: string;
     private readonly path: string;
     private readonly source: FileInfo;
@@ -46,7 +47,7 @@ export default class VisualforceSave extends ToolingSave {
         return this.query;
     }
 
-    async handleConflicts(): Promise<void> {
+    async handleQueryResult(): Promise<void> {
         const queryResult = this.query.getResult();
         if (queryResult.length) {
             return this.handleConflictWithServer({
@@ -64,7 +65,7 @@ export default class VisualforceSave extends ToolingSave {
         }
     }
 
-    async getSaveRequest(containerId: string): Promise<Array<ToolingRequest<any>>> {
+    async getSaveRequests(containerId: string): Promise<Array<ToolingRequest<any>>> {
         let attributes;
 
         // If we're uploading metadata with this file, populate the attribtues attribute.
@@ -98,11 +99,7 @@ export default class VisualforceSave extends ToolingSave {
         })];
     }
 
-    async handleErrorMessages(results?: Array<CompileResult>): Promise<string> {
-        return "oh noes";
-    }
-
-    async handleSaveResult(results?: Array<CompileResult>): Promise<void> {
+    async handleSaveResult(results: Array<ComponentMessage>): Promise<void> {
 
     }
 }

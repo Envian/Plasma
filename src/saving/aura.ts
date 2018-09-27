@@ -28,7 +28,7 @@ export default class Aura extends ToolingStandaloneSave {
         return this.query;
     }
 
-    async handleConflicts(): Promise<void> {
+    async handleQueryResult(): Promise<void> {
         const queryList = await this.query.getResult();
         const queryResults = mapby<string, AuraQuery>(queryList, record => record.DefType);
 

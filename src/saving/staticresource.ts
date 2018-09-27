@@ -33,7 +33,7 @@ export default class StaticResource extends ToolingStandaloneSave {
         return this.query;
     }
 
-    async handleConflicts(): Promise<void> {
+    async handleQueryResult(): Promise<void> {
         const queryResult = await this.query.getResult();
         if (queryResult.length) {
             this.resourceId = queryResult[0].Id;

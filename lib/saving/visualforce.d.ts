@@ -1,8 +1,9 @@
 import Project from "../project.js";
 import ToolingRequest from "../api/tooling/tooling-request.js";
 import Query from "../api/tooling/query.js";
-import ToolingSave, { CompileResult } from "./tooling-save.js";
-export default class VisualforceSave extends ToolingSave {
+import ToolingContainerSave from './tooling-container.js';
+import { ComponentMessage } from './save-manager.js';
+export default class VisualforceSave extends ToolingContainerSave {
     private readonly type;
     private readonly path;
     private readonly source;
@@ -11,8 +12,7 @@ export default class VisualforceSave extends ToolingSave {
     private readonly state?;
     constructor(project: Project, entity: string, savedFiles: Array<any>);
     getConflictQuery(): Query;
-    handleConflicts(): Promise<void>;
-    getSaveRequest(containerId: string): Promise<Array<ToolingRequest<any>>>;
-    handleErrorMessages(results?: Array<CompileResult>): Promise<string>;
-    handleSaveResult(results?: Array<CompileResult>): Promise<void>;
+    handleQueryResult(): Promise<void>;
+    getSaveRequests(containerId: string): Promise<Array<ToolingRequest<any>>>;
+    handleSaveResult(results: Array<ComponentMessage>): Promise<void>;
 }
