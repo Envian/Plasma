@@ -1,4 +1,4 @@
-import { ConfirmationOptions } from "atom";
+import { ConfirmationOptions, TextEditor, RangeCompatible } from "atom";
 
 export function sleep(milliseconds: number): Promise<void> {
     return new Promise(resolve => {
@@ -48,4 +48,40 @@ export function getError(error: any) {
         error = error[0];
     }
     return error.error_description || error.error || error.message || error;
+}
+
+export function addErrorMarker(editors: Array<TextEditor>, line: number): void {
+    if (line == null || !editors || !editors.length) return;
+
+    for (const editor of editors) {
+        const range: RangeCompatible = [[line, 0], [line, editor.getBuffer().getLines()[line].length]];
+        editor.decorateMarker(editor.markBufferRange(range, {
+            plasma: "compile-error",
+            maintainHistory: true,
+            persistent: false,
+            invalidate: "touch"
+        } as any), {
+            type: "line",
+            class: "plasma-error"
+        });
+
+        editor.decorateMarker(editor.markBufferRange(range, {
+            plasma: "compile-error",
+            maintainHistory: true,
+            persistent: false,
+            invalidate: "never"
+        } as any), {
+            type: "line-number",
+            class: "plasma-error"
+        });
+    }
+}
+
+export function clearMarkers(editors: Array<TextEditor>): void {
+    for (const editor of editors) {
+        // Markers support custom properties but TypeScript does not.
+        for (const marker of editor.findMarkers({ plasma: "compile-error" } as any)) {
+            marker.destroy();
+        }
+    }
 }

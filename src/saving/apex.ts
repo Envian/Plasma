@@ -1,4 +1,3 @@
-import { RangeCompatible, TextEditor } from "atom";
 import Project, { FileStatusItem } from "../project.js";
 import ToolingRequest from "../api/tooling/tooling-request.js";
 import Query from "../api/tooling/query.js";
@@ -7,6 +6,7 @@ import { getText } from "../api/soap-helpers.js";
 import FileInfo from "./file-info.js";
 import ToolingContainerSave from "./tooling-container.js";
 import { ComponentMessage } from './save-manager.js';
+import { clearMarkers, addErrorMarker } from '../helpers.js';
 
 export default class ApexSave extends ToolingContainerSave {
     private readonly type: string;
@@ -120,46 +120,12 @@ export default class ApexSave extends ToolingContainerSave {
             const message = result.problem.replace(/\n/g, "\n" + "".padStart(prefix.length, " "));
             errors.push(prefix + message);
 
-            // Highlight errors
-            addErrorMarker(editors, result.lineNumber - 1);
+            if (result.lineNumber) {
+                // Highlight errors
+                addErrorMarker(editors, result.lineNumber - 1);
+            }
         }
         this.errorMessage = errors.filter(error => error).join("\n\n");
-    }
-}
-
-function addErrorMarker(editors: Array<TextEditor>, line: number): void {
-    if (line == null || !editors || !editors.length) return;
-
-    for (const editor of editors) {
-        const range: RangeCompatible = [[line, 0], [line, editor.getBuffer().getLines()[line].length]];
-        editor.decorateMarker(editor.markBufferRange(range, {
-            plasma: "compile-error",
-            maintainHistory: true,
-            persistent: false,
-            invalidate: "touch"
-        } as any), {
-            type: "line",
-            class: "plasma-error"
-        });
-
-        editor.decorateMarker(editor.markBufferRange(range, {
-            plasma: "compile-error",
-            maintainHistory: true,
-            persistent: false,
-            invalidate: "never"
-        } as any), {
-            type: "line-number",
-            class: "plasma-error"
-        });
-    }
-}
-
-function clearMarkers(editors: Array<TextEditor>): void {
-    for (const editor of editors) {
-        // Markers support custom properties but TypeScript does not.
-        for (const marker of editor.findMarkers({ plasma: "compile-error" } as any)) {
-            marker.destroy();
-        }
     }
 }
 
