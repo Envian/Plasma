@@ -30,7 +30,7 @@ export default class ApexSave extends ToolingContainerSave {
             savedFiles.push(this.source);
         }
 
-        const whereClause = this.state ? `Id = "${this.state.id}"` : `Name = "${this.name}"`;
+        const whereClause = this.state ? `Id = '${this.state.id}'` : `Name = '${this.name}'`;
         this.query = new Query(`
             SELECT Id, LastModifiedBy.Name, LastModifiedDate, Body
             FROM ${this.type}
@@ -95,7 +95,7 @@ export default class ApexSave extends ToolingContainerSave {
 
         return [new CRUDRequest({
             sobject: this.type + "Member",
-            method: this.classId ? "PATCH" : "POST",
+            method: "POST",
             body: requestBody
         })];
     }
