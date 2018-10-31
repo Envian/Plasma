@@ -106,11 +106,21 @@ async function saveToolingContainer(project: Project, saves: Array<ToolingContai
     // Dont' let the container stick around after we're done
     await getContainerDeleteRequest(containerId).send(project);
 
-    // TODO: If a file saves, but has a diferent name than what we have locally (A file named MyClass.cls containing)
+    // TODO: If a file saves, but has a diferent name than what we have locally (A file named MyClass.cls containing a class called myService)
     // it will not be possible to link any errors back to it (unless order is preserved in the results)
     const resultsByFile = groupby(saveResult.DeployDetails.allComponentMessages, result => result.fileName);
     await Promise.all(saves.map(save => save.handleSaveResult(resultsByFile.get(save.entity) || [])));
-    return saveResult.DeployDetails.componentFailures.length == 0;
+
+    const errorMessages = saves.filter(save => save.errorMessage).map(save => save.errorMessage).join("\n\n");
+    if (errorMessages) {
+        atom.notifications.addError("Failed to save Lightning Components and/or Static Resources.", {
+            detail: errorMessages,
+            dismissable: true
+        });
+        return false;
+    } else {
+        return true;
+    }
 }
 
 function getContainerSaves(project: Project, filesByFolder: Map<string, Array<FileInfo>>): Array<ToolingContainerSave> {
