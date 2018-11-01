@@ -1,6 +1,6 @@
 /// <reference types="node" />
 import { RequestOptions, OutgoingHttpHeaders } from "http";
-import Project from '../../project.js';
+import Project from "../../project.js";
 export default class ToolingRequest<T> {
     error?: Error;
     protected readonly body: any;

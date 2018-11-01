@@ -1,7 +1,7 @@
-import Project from '../project';
-import Query from '../api/tooling/query';
-import ToolingRequest from '../api/tooling/tooling-request';
-import ToolingStandaloneSave from './tooling-standalone';
+import Project from "../project";
+import Query from "../api/tooling/query";
+import ToolingRequest from "../api/tooling/tooling-request";
+import ToolingStandaloneSave from "./tooling-standalone";
 export default class Aura extends ToolingStandaloneSave {
     private metadata?;
     readonly query: Query;

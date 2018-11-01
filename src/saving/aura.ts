@@ -1,11 +1,11 @@
-import Project from '../project';
-import FileInfo from './file-info';
-import Query from '../api/tooling/query';
-import CRUDRequest from '../api/tooling/crud-sobject';
-import { mapby } from '../helpers';
-import { getText } from '../api/soap-helpers';
-import ToolingRequest from '../api/tooling/tooling-request';
-import ToolingStandaloneSave from './tooling-standalone';
+import Project from "../project";
+import FileInfo from "./file-info";
+import Query from "../api/tooling/query";
+import CRUDRequest from "../api/tooling/crud-sobject";
+import { mapby } from "../helpers";
+import { getText } from "../api/soap-helpers";
+import ToolingRequest from "../api/tooling/tooling-request";
+import ToolingStandaloneSave from "./tooling-standalone";
 
 export default class Aura extends ToolingStandaloneSave {
     private metadata?: FileInfo;

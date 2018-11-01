@@ -1,7 +1,7 @@
 import { request } from "https";
 import { RequestOptions } from "http";
 import { getError } from "../helpers.js";
-import Project from '../project.js';
+import Project from "../project.js";
 
 const INVALID_SESSION = "INVALID_SESSION";
 
