@@ -48,6 +48,8 @@ async function toolingSave(project: Project, files: Array<FileInfo>): Promise<vo
 
     if (allSaves.every(save => save.skip)) {
         atom.notifications.addInfo("No files to save.");
+        // Save just in case we made changes
+        await project.save();
         return;
     }
 

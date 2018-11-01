@@ -42,7 +42,7 @@ export default class StaticResource extends ToolingStandaloneSave {
                 modifiedDate: queryResult[0].LastModifiedDate,
                 id: queryResult[0].Id,
                 type: "StaticResource",
-                body: queryResult[0].Body,
+                body: () => this.downloadStaticResource(),
                 localState: this.state,
                 path: this.entity,
                 name: this.name
@@ -50,6 +50,14 @@ export default class StaticResource extends ToolingStandaloneSave {
         } else {
             return this.handleConflictsMissingFromServer(this.state);
         }
+    }
+
+    async downloadStaticResource(): Promise<string> {
+        // Don't bother batching this because it will rarely be used.
+        return new ToolingRequest<string>({
+            path: `/sobjects/StaticResource/${this.resourceId}/Body`,
+            method: "GET"
+        }, "").sendRaw(this.project) as Promise<string>;
     }
 
     async getSaveRequests(): Promise<Array<ToolingRequest<any>>> {

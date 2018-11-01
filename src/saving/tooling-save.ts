@@ -38,7 +38,7 @@ export default abstract class ToolingSave {
                 const localFile = this.project.files[serverRecord.path] || {};
                 this.project.files[serverRecord.path] = Object.assign(localFile, {
                     id: serverRecord.id,
-                    lastSyncDate: localFile.lastSyncDate || "1970-1-1",
+                    lastSyncDate: serverRecord.modifiedDate || "1970-1-1",
                     type: serverRecord.type
                 });
             }

@@ -1,5 +1,5 @@
 import { RequestOptions, OutgoingHttpHeaders } from "http";
-import { sendAuth } from "../rest-request.js";
+import { sendAuth, sendAuthRaw } from "../rest-request.js";
 import Project from "../../project.js";
 
 let counter = 0;
@@ -14,7 +14,7 @@ export default class ToolingRequest<T>{
     private readonly options: RequestOptions;
     private readonly referenceId: string;
 
-    constructor(options: RequestOptions, body: any, referenceId?: string) {
+    constructor(options: RequestOptions, body?: any, referenceId?: string) {
         this.options = options;
         this.body = body;
         this.referenceId = referenceId || UNIQUE_REFERENCE();
@@ -41,6 +41,17 @@ export default class ToolingRequest<T>{
         this.options.path = `/services/data/v${project.apiVersion}/tooling` + this.options.path;
         try {
             const [result, statusCode] = await sendAuth<T>(project, this.options, this.body);
+            this.handleResponse(result, statusCode);
+            return result;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async sendRaw(project: Project): Promise<string | null> {
+        this.options.path = `/services/data/v${project.apiVersion}/tooling` + this.options.path;
+        try {
+            const [result, statusCode] = await sendAuthRaw(project, this.options, this.body);
             this.handleResponse(result, statusCode);
             return result;
         } catch (error) {

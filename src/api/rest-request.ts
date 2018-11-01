@@ -6,6 +6,11 @@ import Project from "../project.js";
 const INVALID_SESSION = "INVALID_SESSION";
 
 export async function sendAuth<T>(project: Project, options: RequestOptions, body?: any): Promise<[T | null, number]> {
+    const [response, code] = await sendAuthRaw(project, options, body);
+    return [response && JSON.parse(response) as T || null, code];
+}
+
+export async function sendAuthRaw(project: Project, options: RequestOptions, body?: any): Promise<[string | null, number]> {
     options.headers = options.headers || {};
     options.host = project.connection.host;
     options.headers["Content-Type"] = options.headers["Content-Type"] || "application/json";
@@ -18,7 +23,7 @@ export async function sendAuth<T>(project: Project, options: RequestOptions, bod
 
     try {
         const [response, code] = await restWrapper(options, body);
-        return [response && (JSON.parse(response) as T) || null, code];
+        return [response || null, code];
     } catch (error) {
         if (error === INVALID_SESSION) {
             try {
@@ -29,7 +34,7 @@ export async function sendAuth<T>(project: Project, options: RequestOptions, bod
             options.host = project.connection.host;
             options.headers.Authorization = await project.getOauth();
             const [response, code] = await restWrapper(options, body);
-            return [response && (JSON.parse(response) as T) || null, code];
+            return [response || null, code];
         }
         throw error;
     }

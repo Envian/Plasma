@@ -8,10 +8,11 @@ export default class ToolingRequest<T> {
     statusCode?: number;
     private readonly options;
     private readonly referenceId;
-    constructor(options: RequestOptions, body: any, referenceId?: string);
+    constructor(options: RequestOptions, body?: any, referenceId?: string);
     handleResponse(rawResponse: any, statusCode: number): void;
     getSubrequest(project: Project): CompositeRequestItem;
     send(project: Project): Promise<T | null>;
+    sendRaw(project: Project): Promise<string | null>;
     getResult(): T;
 }
 export interface CompositeRequestItem {
