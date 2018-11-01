@@ -13,10 +13,10 @@
     "lightning",
     "aura"
   ],
-  "repository": "https://github.com/Envian/plasma",
-  "homepage": "https://github.com/Envian/plasma",
+  "repository": "https://github.com/Envian/Plasma",
+  "homepage": "https://github.com/Envian/Plasma",
   "bugs": {
-    "url": "https://github.com/Envian/plasma"
+    "url": "https://github.com/Envian/Plasma"
   },
   "license": "MIT",
   "engines": {
@@ -28,10 +28,25 @@
     "jszip": ">=3.1.5",
     "opn": ">=0.5.2"
   },
+  "devDependencies": {
+    "typescript": "latest",
+    "tslib": "latest",
+    "@types/node": "latest",
+    "@types/atom": "latest",
+    "@types/keytar": "latest",
+    "@types/jszip": "latest",
+    "@types/opn": "latest"
+  },
   "package-deps": {
     "language-salesforce": ">=0.6.0"
   },
   "deserializers": {
     "SettingsModel": "deserialize"
-  }
+  },
+  "files": [
+    "keymaps/**/*",
+    "lib/**/*",
+    "menus/**/*",
+    "styles/**/*"
+  ]
 }
