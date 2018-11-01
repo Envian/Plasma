@@ -10,9 +10,10 @@ import ToolingStandaloneSave from "./tooling-standalone";
 export default class Aura extends ToolingStandaloneSave {
     private metadata?: FileInfo;
     public readonly query: Query;
-    private savesByType: { [key: string]: CRUDRequest<any> } = {};
+    private readonly savesByType: { [key: string]: CRUDRequest<any> } = {};
     private bundleId?: string;
     private readonly files: Array<FileInfo>;
+    private readonly existingIdsByType: { [Key: string]: string} = {};
 
     constructor(project: Project, entity: string, savedFiles: Array<any>) {
         super(project, entity);
@@ -40,10 +41,12 @@ export default class Aura extends ToolingStandaloneSave {
 
         for (const file of this.files) {
             if (!file.isMetadata) {
-                const serverFile = queryResults.get(getComponentType(file.path));
+                const type = getComponentType(file.path);
+                const serverFile = queryResults.get(type);
                 const state = this.project.files[file.path];
 
                 if (serverFile) {
+                    this.existingIdsByType[type] = serverFile.Id;
                     await this.handleConflictWithServer({
                         modifiedBy: serverFile.LastModifiedBy.Name,
                         modifiedDate: serverFile.LastModifiedDate,
@@ -64,18 +67,14 @@ export default class Aura extends ToolingStandaloneSave {
     async getSaveRequests(): Promise<Array<ToolingRequest<any>>> {
         const queryResults = await this.query.getResult();
         const saveRequests = [] as Array<CRUDRequest<any>>;
-        let attributes;
+        let attributes : any;
 
         // Check if we need to create the metadata file (aka new file)
         if (!this.metadata && !queryResults.length) {
-            const rootComponent = this.files.find(file => file.path.endsWith("cmp") || file.path.endsWith("app"));
+            const rootComponent = this.files.find(file => file.path.endsWith("cmp") || file.path.endsWith("app") || file.path.endsWith("evt") || file.path.endsWith("tokens") || file.path.endsWith("intf"));
             if (rootComponent) {
                 this.metadata = new FileInfo(this.project, rootComponent.path + "-meta.xml");
                 this.files.push(this.metadata);
-                attributes = {
-                    developerName: this.name,
-                    masterLabel: this.name,
-                }
             } else {
                 // Aura Components require a cmp or app to save.
                 this.errorMessage = `${this.entity} is missing a component or app file.`;
@@ -84,22 +83,24 @@ export default class Aura extends ToolingStandaloneSave {
         }
 
         if (this.metadata) {
-            if (this.metadata.body) {
+            if (await this.metadata.exists()) {
                 const metadataFile = new DOMParser().parseFromString(await this.metadata.read(), "text/xml");
                 attributes = {
                     apiVersion: getText(metadataFile, "//met:apiVersion/text()"),
-                    description: getText(metadataFile, "//met:description/text()"),
-                    developerName: attributes && attributes.developerName,
-                    masterLabel: attributes && attributes.masterLabel
+                    description: getText(metadataFile, "//met:description/text()")
                 };
             } else {
                 attributes = {
                     apiVersion: this.project.apiVersion,
-                    description: this.name,
-                    developerName: attributes && attributes.developerName,
-                    masterLabel: attributes && attributes.masterLabel
+                    description: this.name
                 };
                 await this.metadata.write(getAuraDefaultMetadata(this.project.apiVersion, this.name));
+            }
+
+            if (!this.bundleId) {
+                // New files need DeveloperName and MasterLabel
+                attributes.developerName = this.name;
+                attributes.masterLabel = this.name;
             }
 
             this.savesByType["_METADATA"] = new CRUDRequest({
@@ -112,28 +113,29 @@ export default class Aura extends ToolingStandaloneSave {
             saveRequests.push(this.savesByType["_METADATA"]);
         }
 
-        return saveRequests.concat(this.files.map(file => {
+        return saveRequests.concat(await Promise.all(this.files.map(async (file) => {
             if (file.isMetadata) return;
 
-            const state = this.project.files[file.path];
             const type = getComponentType(file.path);
+            const id = this.existingIdsByType[type];
             const request = new CRUDRequest({
                 sobject: "AuraDefinition",
-                method: state ? "PATCH" : "POST",
-                id: state && state.id,
+                method: id ? "PATCH" : "POST",
+                id: id,
                 body: {
-                    Source: file.body,
+                    Source: await file.read(),
                     DefType: type,
                     Format: TYPE_TO_FORMAT[type],
-                    AuraDefinitionBundleId: this.bundleId ? undefined : `@{${this.name}_bundleId.id}`
+                    AuraDefinitionBundleId: id ? undefined : (this.bundleId || `@{${this.name}_bundleId.id}`)
                 }
             });
             this.savesByType[type] = request;
             return request;
-        }) as Array<CRUDRequest<any>>).filter(save => save);
+        }) as Array<Promise<CRUDRequest<any>>>)).filter(save => save);
     }
 
     async handleSaveResult(): Promise<void> {
+        console.log(this.savesByType);
         this.errorMessage = this.files.reduce((err, file) => {
             const result = this.savesByType[getComponentType(file.path)].result;
             if (result && !result.success) {
