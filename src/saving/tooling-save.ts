@@ -9,18 +9,16 @@ import FileInfo from './file-info.js';
 export default abstract class ToolingSave {
     protected readonly project : Project;
     protected readonly folder: string;
-    protected readonly files: Array<FileInfo>; // TODO: Need a wrapper class for the saved file.
     public readonly name: string;
     public readonly entity: string;
     public errorMessage?: string;
     public skip: boolean;
 
-    constructor(project: Project, entity: string, savedFiles: Array<FileInfo>) {
+    constructor(project: Project, entity: string) {
         this.project = project;
         this.entity = entity;
         this.name = getName(this.entity);
         this.folder = this.entity.substring(0, this.entity.indexOf("/"));
-        this.files = savedFiles;
 
         this.skip = false;
     }
