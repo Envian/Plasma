@@ -3,8 +3,6 @@
 import { confirm } from "../helpers.js";
 import Project, { FileStatusItem } from "../project.js";
 import Query from "../api/tooling/query.js";
-import FileInfo from './file-info.js';
-
 
 export default abstract class ToolingSave {
     protected readonly project : Project;

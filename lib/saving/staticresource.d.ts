@@ -4,8 +4,8 @@ import ToolingRequest from '../api/tooling/tooling-request';
 import ToolingStandaloneSave from './tooling-standalone';
 export default class StaticResource extends ToolingStandaloneSave {
     private readonly state?;
-    private readonly source?;
-    private metadata?;
+    private readonly source;
+    private readonly metadata;
     private readonly query;
     private saveRequest?;
     private resourceId?;

@@ -8,18 +8,18 @@ import ToolingStandaloneSave from './tooling-standalone';
 
 export default class StaticResource extends ToolingStandaloneSave {
     private readonly state?: FileStatusItem;
-    private readonly source?: FileInfo;
-    private metadata?: FileInfo;
+    private readonly source: FileInfo;
+    private readonly metadata: FileInfo;
     private readonly query: Query;
     private saveRequest?: CRUDRequest<any>;
     private resourceId?: string;
 
     constructor(project: Project, entity: string, savedFiles: Array<any>) {
-        super(project, entity, savedFiles);
+        super(project, entity);
 
         this.state = project.files[this.entity];
-        this.metadata = savedFiles.find(file => file.isMetadata);
         this.source = savedFiles.find(file => !file.isMetadata) || new FileInfo(project, this.entity);
+        this.metadata = savedFiles.find(file => file.isMetadata) || new FileInfo(project, this.entity + "-meta.xml");
 
         const whereClause = this.state ? `Id = '${this.state.id}'` : `Name = '${this.name}'`;
         this.query = new Query(`
@@ -55,29 +55,15 @@ export default class StaticResource extends ToolingStandaloneSave {
     async getSaveRequests(): Promise<Array<ToolingRequest<any>>> {
         let attributes;
 
-        // Check if we need to create the metadata file (aka new file)
-        if (!this.metadata && !this.resourceId) {
-            const metadataFile = new FileInfo(this.project, this.entity + "-meta.xml");
-            if (await metadataFile.exists()) {
-                this.metadata = metadataFile;
-            }
-        }
-
-        if (this.metadata) {
+        if (await this.metadata.exists()) {
             const metadataFile = new DOMParser().parseFromString(await this.metadata.read(), "text/xml");
             attributes = {
                 cacheControl: getText(metadataFile, "//met:cacheControl/text()"),
                 contentType: getText(metadataFile, "//met:contentType/text()")
             };
         } else if (!this.resourceId) {
-            // TODO: What do we do about brand new static resources?
-            throw Error("New static resources must include a -meta.xml file.")
-            // this.metadata.attributes = {
-            //     cacheControl: "private",
-            //     contentType: "image/meme-macro"
-            // };
-            // await this.project.srcFolder.getFile(this.metadata.path)
-            //     .write(getDefaultMetadata(this.project.apiVersion, this.type));
+            throw Error("New static resources must include a -meta.xml file.");
+            //TODO: Only throwing this error because we can't predict the MIME type.
         }
 
         this.saveRequest = new CRUDRequest({

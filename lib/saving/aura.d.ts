@@ -7,6 +7,7 @@ export default class Aura extends ToolingStandaloneSave {
     readonly query: Query;
     private savesByType;
     private bundleId?;
+    private readonly files;
     constructor(project: Project, entity: string, savedFiles: Array<any>);
     getConflictQuery(): Query;
     handleQueryResult(): Promise<void>;

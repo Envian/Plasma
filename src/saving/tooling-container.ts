@@ -107,6 +107,11 @@ export default abstract class ToolingContainerSave extends ToolingSave {
         clearMarkers(editors);
 
         if (results.length == 1 && results[0].success) {
+            const fileEntry = this.project.files[this.entity] || {};
+            fileEntry.id = results[0].id || fileEntry.id;
+            fileEntry.lastSyncDate = new Date().toISOString();
+            fileEntry.type = this.type;
+            this.project.files[this.entity] = fileEntry;
             return;
         }
 

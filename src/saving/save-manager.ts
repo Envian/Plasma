@@ -14,6 +14,7 @@ import StaticResourceSave from "./staticresource.js";
 import ToolingStandaloneSave from './tooling-standalone.js';
 import ToolingContainerSave from './tooling-container.js';
 import CRUDRequest, { CRUDResult } from '../api/tooling/crud-sobject.js';
+import ToolingSave from './tooling-save.js';
 
 export async function saveFiles(project: Project, files: Array<FileInfo>): Promise<void> {
     if (files.every(file => file.isTooling)) {
@@ -33,7 +34,7 @@ async function toolingSave(project: Project, files: Array<FileInfo>): Promise<vo
     const filesByFolder = groupby(files, file => file.folderName);
     const containerSaves = getContainerSaves(project, filesByFolder);
     const standaloneSaves = getStandaloneSaves(project, filesByFolder);
-    const allSaves = containerSaves.concat(standaloneSaves);
+    const allSaves = (containerSaves as Array<ToolingSave>).concat(standaloneSaves);
 
     if (!allSaves.length) {
         atom.notifications.addInfo("No files to save.");

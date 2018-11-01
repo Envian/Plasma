@@ -12,10 +12,12 @@ export default class Aura extends ToolingStandaloneSave {
     public readonly query: Query;
     private savesByType: { [key: string]: CRUDRequest<any> } = {};
     private bundleId?: string;
+    private readonly files: Array<FileInfo>;
 
     constructor(project: Project, entity: string, savedFiles: Array<any>) {
-        super(project, entity,  savedFiles);
+        super(project, entity);
 
+        this.files = savedFiles;
         this.metadata = savedFiles.find(file => file.isMetadata);
         this.query = new Query(`
             SELECT Id, DefType, Source, LastModifiedBy.Name, LastModifiedDate, AuraDefinitionBundleId
