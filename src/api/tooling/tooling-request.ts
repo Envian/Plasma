@@ -1,6 +1,6 @@
 import { RequestOptions, OutgoingHttpHeaders } from "http";
 import { sendAuth } from "../rest-request.js";
-import Project from '../../project.js';
+import Project from "../../project.js";
 
 let counter = 0;
 function UNIQUE_REFERENCE() { return "Unused_Reference_" + counter++; }

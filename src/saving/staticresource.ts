@@ -1,10 +1,10 @@
-import Project, { FileStatusItem } from '../project';
-import FileInfo from './file-info';
-import Query from '../api/tooling/query';
-import CRUDRequest from '../api/tooling/crud-sobject';
-import { getText } from '../api/soap-helpers';
-import ToolingRequest from '../api/tooling/tooling-request';
-import ToolingStandaloneSave from './tooling-standalone';
+import Project, { FileStatusItem } from "../project";
+import FileInfo from "./file-info";
+import Query from "../api/tooling/query";
+import CRUDRequest from "../api/tooling/crud-sobject";
+import { getText } from "../api/soap-helpers";
+import ToolingRequest from "../api/tooling/tooling-request";
+import ToolingStandaloneSave from "./tooling-standalone";
 
 export default class StaticResource extends ToolingStandaloneSave {
     private readonly state?: FileStatusItem;

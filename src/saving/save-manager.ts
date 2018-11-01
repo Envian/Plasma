@@ -11,10 +11,10 @@ import ApexSave from "./apex.js";
 import VisualforceSave from "./visualforce.js";
 import AuraSave from "./aura.js";
 import StaticResourceSave from "./staticresource.js";
-import ToolingStandaloneSave from './tooling-standalone.js';
-import ToolingContainerSave from './tooling-container.js';
-import CRUDRequest, { CRUDResult } from '../api/tooling/crud-sobject.js';
-import ToolingSave from './tooling-save.js';
+import ToolingStandaloneSave from "./tooling-standalone.js";
+import ToolingContainerSave from "./tooling-container.js";
+import CRUDRequest, { CRUDResult } from "../api/tooling/crud-sobject.js";
+import ToolingSave from "./tooling-save.js";
 
 export async function saveFiles(project: Project, files: Array<FileInfo>): Promise<void> {
     if (files.every(file => file.isTooling)) {

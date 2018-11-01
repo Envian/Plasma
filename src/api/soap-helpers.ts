@@ -1,4 +1,4 @@
-import Project from '../project';
+import Project from "../project";
 
 const INVALID_SESSION = "INVALID_SESSION";
 const SOAP_NAMESPACES: {[index:string]: string} = {

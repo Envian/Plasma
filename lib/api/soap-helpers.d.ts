@@ -1,4 +1,4 @@
-import Project from '../project';
+import Project from "../project";
 export declare function soapRequest(project: Project, body: Element | Array<Element>): Promise<Document>;
 export declare function getText(dom: Node, path: string): string;
 export declare function getNode(dom: Node, path: string): Node;

@@ -1,12 +1,12 @@
-import ToolingSave from './tooling-save';
-import ToolingRequest from '../api/tooling/tooling-request';
-import { ComponentMessage } from './save-manager';
-import FileInfo from './file-info';
+import ToolingSave from "./tooling-save";
+import ToolingRequest from "../api/tooling/tooling-request";
+import { ComponentMessage } from "./save-manager";
+import FileInfo from "./file-info";
 import Project, { FileStatusItem } from "../project.js";
-import Query from 'api/tooling/query';
-import { getText } from 'api/soap-helpers';
-import CRUDRequest from 'api/tooling/crud-sobject';
-import { clearMarkers, addErrorMarker } from 'helpers';
+import Query from "../api/tooling/query";
+import { getText } from "../api/soap-helpers";
+import CRUDRequest from "../api/tooling/crud-sobject";
+import { clearMarkers, addErrorMarker } from "../helpers";
 
 const FOLDER_TO_TYPE: {[key: string]: string} = {
     "classes": "ApexClass",

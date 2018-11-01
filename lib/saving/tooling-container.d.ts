@@ -1,9 +1,9 @@
-import ToolingSave from './tooling-save';
-import ToolingRequest from '../api/tooling/tooling-request';
-import { ComponentMessage } from './save-manager';
-import FileInfo from './file-info';
+import ToolingSave from "./tooling-save";
+import ToolingRequest from "../api/tooling/tooling-request";
+import { ComponentMessage } from "./save-manager";
+import FileInfo from "./file-info";
 import Project, { FileStatusItem } from "../project.js";
-import Query from 'api/tooling/query';
+import Query from "../api/tooling/query";
 export default abstract class ToolingContainerSave extends ToolingSave {
     protected readonly type: string;
     protected readonly source: FileInfo;
