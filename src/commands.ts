@@ -69,6 +69,15 @@ export default class {
         }
     }
 
+    static async cleanProject(): Promise<void> {
+        const project = await getProjectForAction();
+        if (project) {
+            return project.cleanProject();
+        } else {
+            atom.notifications.addError("No project found.");
+        }
+    }
+
     static async deleteFromServer(): Promise<void> {
         const files = getFilesFromTree();
         const project = await getProjectForFilesAndDirs(files);

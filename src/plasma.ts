@@ -19,6 +19,7 @@ export async function activate() {
             "plasma:new-project": () => Commands.newProject(),
             "plasma:edit-project": () => Commands.editProject(),
             "plasma:refresh-from-server": () => Commands.refreshFromServer(),
+            "plasma:refresh-and-clean": () => Commands.cleanProject(),
             "plasma:save-to-server": () => Commands.saveToServer(),
             "plasma:delete-from-server": () => Commands.deleteFromServer(),
             "plasma:open-sfdc": () => Commands.openSFDC()

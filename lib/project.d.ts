@@ -21,6 +21,7 @@ export default class Project extends EventEmitter {
     load(): Promise<void>;
     refreshAPIVersions(): Promise<void>;
     refreshFromServer(): Promise<void>;
+    cleanProject(): Promise<void>;
     authenticate(type: ServerType): Promise<void>;
     handleAuthResult(result: AuthorizationResult, type: ServerType, connectionInfo?: [Promise<UserInfoResult>, Promise<string[]>]): Promise<void>;
     reauthenticate(): Promise<String>;

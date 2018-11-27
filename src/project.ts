@@ -1,6 +1,7 @@
 import { setPassword, getPassword } from "keytar";
 import { EventEmitter } from "events";
 import { File, Directory } from "atom";
+import { unlink, rmdir } from "fs";
 
 import { register, findProjectForFile, findProjectForDirectory, getProjectForFilesAndDirs } from "./project-manager.js";
 
@@ -10,6 +11,7 @@ import { refreshToken } from "./api/rest/login.js";
 import getApiVersions from "./api/rest/api-versions.js";
 import getUserInfo, { UserInfoResult } from "./api/rest/user-info.js";
 import retrieve from "./api/metadata/retrieve.js";
+import { flatten, getEntriesRecusively, getEntries } from "./helpers.js";
 
 
 export default class Project extends EventEmitter {
@@ -107,9 +109,10 @@ export default class Project extends EventEmitter {
         // TODO: already refreshing check?
         try {
             const { files, zip } = await retrieve(this);
-            Object.assign(this.files, files);
+            this._files = files;
             const savePromise = this.save();
 
+            // Write all saved files.
             await Promise.all(Object.entries(zip.files).map(async ([dir, zipObj]: [string, any]) => {
                 const data = await zipObj.async("string");
                 return this.srcFolder.getFile(dir).write(data);
@@ -121,6 +124,38 @@ export default class Project extends EventEmitter {
                 dismissable: true
             });
         }
+    }
+
+    async cleanProject(): Promise<void> {
+        await this.refreshFromServer();
+
+        // Convert newFiles from a list of strings to follow the proper file format.
+        const newFiles = new Set(Object.keys(this.files).map(file => new File(file).getPath().toLowerCase()));
+        const localFiles = await getEntriesRecusively(this.srcFolder);
+
+        // Clear out any file which was not just now downloaded
+        const filesToDelete = localFiles.filter(file => file.isFile()).filter(file => {
+            const path = file.getPath();
+            const correctedPath = path.endsWith("-meta.xml") ? path.substr(0, path.lastIndexOf("-meta.xml")) : path;
+            return !newFiles.has(this.srcFolder.relativize(correctedPath).toLowerCase());
+        })
+        await Promise.all(filesToDelete.map(file => {
+            return new Promise(resolve => {
+                unlink(file.getPath(), resolve);
+            });
+        }));
+
+        // Delete any empty directories
+        await Promise.all(localFiles.filter(dir => dir.isDirectory()).map(async (dir) => {
+            if (!(await getEntries(dir as Directory)).length) {
+                await new Promise((resolve, reject) => {
+                    rmdir(dir.getPath(), (error) => {
+                        if (error) reject(error);
+                        resolve();
+                    });
+                });
+            }
+        }));
     }
 
     // Prompts the user to authenticate. Simply never returns if the user opts not to authenticate.

@@ -1,4 +1,4 @@
-import { ConfirmationOptions, TextEditor, RangeCompatible } from "atom";
+import { ConfirmationOptions, TextEditor, RangeCompatible, File, Directory } from "atom";
 
 export function sleep(milliseconds: number): Promise<void> {
     return new Promise(resolve => {
@@ -84,4 +84,19 @@ export function clearMarkers(editors: Array<TextEditor>): void {
             marker.destroy();
         }
     }
+}
+
+export async function getEntries(rootDir: Directory): Promise<Array<Directory|File>> {
+    return new Promise((resolve, reject) => {
+        rootDir.getEntries((error: Error | null, entries: Array<Directory | File>) => {
+            if (error) reject(error);
+            resolve(entries);
+        });
+    }) as Promise<Array<Directory|File>>;
+}
+
+export async function getEntriesRecusively(rootDir: Directory): Promise<Array<File|Directory>> {
+    const entries = await getEntries(rootDir);
+    const directories = entries.filter(entry => entry.isDirectory()) as Array<Directory>;
+    return entries.concat(flatten(await Promise.all(directories.map(getEntriesRecusively))));
 }
