@@ -2,6 +2,8 @@
 A Standalone plugin for salesforce development. This is currently in an early alpha and is likely unsuitable for regular
 use. See features, limitations and known issues below.
 
+**NOTICE:** This was designed for Atom, which is no longer supported. This repository remains for reference, but should not be used.
+
 ### Usage
 1. Right-Click the folder you want to turn into a Salesforce project, and select `Plasma > New Project`.
 2. Ensure the project path is correct. If you are using a project downloaded earlier, this folder should contain the `src` folder.
